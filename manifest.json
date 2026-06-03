@@ -1,12 +1,14 @@
 {
-  "name": "NUMEROLOGIC — персональная нумерология",
+  "name": "NUMEROLOGIC — нумерологический навигатор по подписке",
   "short_name": "NUMEROLOGIC",
-  "description": "PWA-сервис для нумерологического расчета и заявки на персональный разбор.",
+  "description": "RU PWA-сервис подписки на персональные нумерологические прогнозы, сильные даты и совместимость.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#080a12",
-  "theme_color": "#111827",
+  "background_color": "#08050d",
+  "theme_color": "#100b17",
+  "categories": ["lifestyle", "productivity"],
+  "lang": "ru",
   "icons": [
     { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
