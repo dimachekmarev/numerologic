@@ -1,1 +1,254 @@
-<!DOCTYPE html><html><head><title>NUMEROLOGIC</title></head><body>App Placeholder</body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NUMEROLOGIC — персональная нумерология и разбор даты рождения</title>
+  <meta name="description" content="NUMEROLOGIC — PWA-сервис для быстрого нумерологического разбора: число жизненного пути, предназначение, душа, личность, персональный год и заявка на консультацию." />
+  <meta name="theme-color" content="#111827" />
+  <meta property="og:title" content="NUMEROLOGIC — персональная нумерология" />
+  <meta property="og:description" content="Рассчитайте базовый нумерологический профиль и получите персональный разбор." />
+  <meta property="og:type" content="website" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <style>
+    :root {
+      --bg: #080a12;
+      --panel: rgba(255,255,255,.075);
+      --panel-strong: rgba(255,255,255,.12);
+      --text: #f8fafc;
+      --muted: #a7b0c0;
+      --line: rgba(255,255,255,.13);
+      --gold: #f8d57e;
+      --violet: #a78bfa;
+      --cyan: #67e8f9;
+      --ok: #86efac;
+      --danger: #fda4af;
+      --shadow: 0 25px 70px rgba(0,0,0,.35);
+      --radius: 26px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(167,139,250,.26), transparent 28rem),
+        radial-gradient(circle at 82% 18%, rgba(103,232,249,.18), transparent 24rem),
+        radial-gradient(circle at 50% 90%, rgba(248,213,126,.16), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; }
+    header {
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: blur(18px);
+      background: rgba(8,10,18,.72);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav { display:flex; align-items:center; justify-content:space-between; gap: 18px; padding: 16px 0; }
+    .brand { display:flex; align-items:center; gap: 12px; font-weight: 900; letter-spacing: .08em; }
+    .logo {
+      width: 42px; height: 42px; border-radius: 15px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, var(--gold), var(--violet));
+      color: #111827; font-weight: 950; box-shadow: 0 12px 28px rgba(248,213,126,.22);
+    }
+    .nav-links { display:flex; gap: 18px; align-items:center; color: var(--muted); font-size: 14px; }
+    .nav-links a { text-decoration: none; }
+    .nav-links a:hover { color: var(--text); }
+    .btn {
+      border: 0; border-radius: 999px; padding: 13px 18px; cursor:pointer;
+      background: linear-gradient(135deg, var(--gold), #fb7185);
+      color: #111827; font-weight: 850; text-decoration:none; display:inline-flex; align-items:center; gap: 8px;
+      box-shadow: 0 18px 38px rgba(248,213,126,.18);
+    }
+    .btn.secondary { background: var(--panel-strong); color: var(--text); box-shadow: none; border: 1px solid var(--line); }
+    .hero { display:grid; grid-template-columns: 1.02fr .98fr; gap: 34px; align-items:center; padding: 72px 0 42px; }
+    .eyebrow { color: var(--gold); font-weight: 850; letter-spacing:.08em; text-transform:uppercase; font-size: 13px; }
+    h1 { font-size: clamp(40px, 6vw, 78px); line-height: .96; margin: 16px 0 18px; letter-spacing: -.055em; }
+    h2 { font-size: clamp(30px, 4vw, 48px); line-height: 1.02; margin: 0 0 16px; letter-spacing: -.035em; }
+    h3 { margin: 0 0 10px; font-size: 20px; }
+    p { color: var(--muted); line-height: 1.68; }
+    .hero p { font-size: 18px; max-width: 660px; }
+    .actions { display:flex; flex-wrap:wrap; gap: 12px; margin-top: 26px; }
+    .trust { display:flex; flex-wrap:wrap; gap: 10px; margin-top: 28px; }
+    .pill { border: 1px solid var(--line); background: rgba(255,255,255,.055); border-radius: 999px; padding: 9px 12px; color: var(--muted); font-size: 13px; }
+    .card {
+      border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.045));
+      border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px;
+    }
+    .calculator { position: relative; overflow:hidden; }
+    .calculator:before { content:""; position:absolute; inset:-1px; background: radial-gradient(circle at 80% 0%, rgba(248,213,126,.2), transparent 18rem); pointer-events:none; }
+    .calculator > * { position:relative; }
+    label { display:block; color: var(--muted); font-size: 13px; margin-bottom: 7px; }
+    input, select, textarea {
+      width: 100%; border: 1px solid var(--line); border-radius: 16px; padding: 14px 14px;
+      background: rgba(0,0,0,.22); color: var(--text); outline: none; font: inherit;
+    }
+    input:focus, textarea:focus { border-color: rgba(248,213,126,.65); box-shadow: 0 0 0 4px rgba(248,213,126,.12); }
+    .grid2 { display:grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .form-row { margin-bottom: 14px; }
+    .numbers { display:grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 18px; }
+    .num-card { border: 1px solid var(--line); background: rgba(0,0,0,.2); border-radius: 18px; padding: 16px; }
+    .num { font-size: 36px; font-weight: 950; color: var(--gold); line-height: 1; }
+    .num-card span { color: var(--muted); font-size: 13px; }
+    section { padding: 48px 0; }
+    .features { display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature { min-height: 210px; }
+    .feature .icon { width: 42px; height: 42px; border-radius: 14px; background: rgba(167,139,250,.18); display:grid; place-items:center; margin-bottom: 14px; }
+    .product { display:grid; grid-template-columns: .9fr 1.1fr; gap: 20px; align-items:start; }
+    .steps { display:grid; gap: 12px; counter-reset: step; }
+    .step { display:flex; gap: 14px; padding: 16px; border:1px solid var(--line); border-radius: 20px; background: rgba(255,255,255,.045); }
+    .step:before { counter-increment: step; content: counter(step); flex: 0 0 34px; height:34px; border-radius: 12px; display:grid; place-items:center; color:#111827; background: var(--gold); font-weight:900; }
+    .pricing { display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .price { position:relative; }
+    .price strong { font-size: 34px; color: var(--text); }
+    .price ul { padding-left: 18px; color: var(--muted); line-height:1.8; }
+    .badge { color: #111827; background: var(--ok); padding: 7px 10px; border-radius: 999px; font-size: 12px; font-weight: 900; display:inline-block; margin-bottom: 12px; }
+    .lead { display:grid; grid-template-columns: .95fr 1.05fr; gap: 20px; align-items:start; }
+    .result-box { margin-top: 16px; padding: 16px; border-radius: 18px; background: rgba(0,0,0,.26); border: 1px solid var(--line); white-space: pre-wrap; color: var(--text); line-height:1.6; min-height: 88px; }
+    footer { border-top: 1px solid var(--line); padding: 28px 0 44px; color: var(--muted); }
+    .legal { display:flex; gap: 14px; flex-wrap:wrap; font-size: 13px; }
+    .notice { color: var(--muted); font-size: 12px; margin-top: 10px; }
+    @media (max-width: 860px) {
+      .hero, .product, .lead { grid-template-columns: 1fr; }
+      .features, .pricing { grid-template-columns: 1fr; }
+      .nav-links { display:none; }
+      .grid2, .numbers { grid-template-columns: 1fr; }
+      section { padding: 34px 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell nav">
+      <div class="brand"><div class="logo">N</div><span>NUMEROLOGIC</span></div>
+      <nav class="nav-links" aria-label="Главное меню">
+        <a href="#calc">Калькулятор</a>
+        <a href="#product">Продукт</a>
+        <a href="#pricing">Тарифы</a>
+        <a href="#lead">Заявка</a>
+      </nav>
+      <a class="btn secondary" href="#lead">Получить разбор</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="shell hero">
+      <section aria-labelledby="hero-title">
+        <div class="eyebrow">PWA • консультации • персональный профиль</div>
+        <h1 id="hero-title">Нумерологический разбор, который можно продать уже сегодня</h1>
+        <p>NUMEROLOGIC превращает дату рождения и имя клиента в понятный профиль: сильные стороны, фокус года, риски, рекомендации и заявку на платную консультацию.</p>
+        <div class="actions">
+          <a class="btn" href="#calc">Рассчитать бесплатно</a>
+          <a class="btn secondary" href="#product">Посмотреть продукт</a>
+        </div>
+        <div class="trust">
+          <span class="pill">Без установки</span>
+          <span class="pill">Работает офлайн как PWA</span>
+          <span class="pill">Лид-форма без backend</span>
+          <span class="pill">Готово для лендинга</span>
+        </div>
+      </section>
+
+      <section class="card calculator" id="calc" aria-labelledby="calc-title">
+        <div class="eyebrow">Быстрый расчет</div>
+        <h2 id="calc-title">Ваш личный код</h2>
+        <form id="calcForm">
+          <div class="form-row">
+            <label for="fullName">Имя и фамилия</label>
+            <input id="fullName" name="fullName" autocomplete="name" placeholder="Например: Анна Иванова" required />
+          </div>
+          <div class="grid2">
+            <div class="form-row">
+              <label for="birthDate">Дата рождения</label>
+              <input id="birthDate" name="birthDate" type="date" required />
+            </div>
+            <div class="form-row">
+              <label for="focus">Запрос</label>
+              <select id="focus" name="focus">
+                <option>Деньги и карьера</option>
+                <option>Отношения</option>
+                <option>Предназначение</option>
+                <option>Личный год</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn" type="submit">Показать профиль</button>
+        </form>
+        <div class="numbers" id="numbers" aria-live="polite"></div>
+        <div class="result-box" id="interpretation">Введите имя и дату рождения — здесь появится краткий разбор.</div>
+        <p class="notice">Это развлекательный и консультационный инструмент, не медицинская, юридическая или финансовая рекомендация.</p>
+      </section>
+    </div>
+
+    <section class="shell" id="product">
+      <div class="product">
+        <div>
+          <div class="eyebrow">Коммерческий MVP</div>
+          <h2>Что уже входит в продукт</h2>
+          <p>Стартовая версия закрывает главный коммерческий сценарий: человек получает бесплатный мини-разбор, видит ценность и оставляет заявку на глубокую консультацию.</p>
+        </div>
+        <div class="features">
+          <article class="card feature"><div class="icon">🔢</div><h3>Расчет ядра</h3><p>Число жизненного пути, душа, личность, предназначение и персональный год.</p></article>
+          <article class="card feature"><div class="icon">✨</div><h3>Интерпретация</h3><p>Короткий текст под запрос клиента: деньги, отношения, предназначение или годовой фокус.</p></article>
+          <article class="card feature"><div class="icon">📩</div><h3>Заявка</h3><p>Форма собирает контакт и формирует готовое сообщение для консультации.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell">
+      <div class="card">
+        <div class="eyebrow">Воронка</div>
+        <h2>Как монетизировать</h2>
+        <div class="steps">
+          <div class="step"><div><h3>Бесплатный расчет</h3><p>Пользователь вводит имя и дату рождения, получает быстрый результат и эмоциональный крючок.</p></div></div>
+          <div class="step"><div><h3>Платный разбор</h3><p>После мини-профиля предлагается персональный PDF/аудио/созвон с конкретными рекомендациями.</p></div></div>
+          <div class="step"><div><h3>Пакеты и подписка</h3><p>Добавляются совместимость пары, прогноз месяца, календарь сильных дат и консультации.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell" id="pricing">
+      <div class="eyebrow">Тарифы</div>
+      <h2>Пакеты для продаж</h2>
+      <div class="pricing">
+        <article class="card price"><h3>Мини-разбор</h3><strong>990 ₽</strong><p>Для первого касания.</p><ul><li>PDF 3–5 страниц</li><li>Ключевые числа</li><li>1 главный совет</li></ul></article>
+        <article class="card price"><span class="badge">Лучший старт</span><h3>Глубокий профиль</h3><strong>3 900 ₽</strong><p>Основной коммерческий продукт.</p><ul><li>PDF 12–18 страниц</li><li>Разбор запроса</li><li>30 минут консультации</li></ul></article>
+        <article class="card price"><h3>Премиум</h3><strong>9 900 ₽</strong><p>Для клиентов с высоким чеком.</p><ul><li>Профиль + совместимость</li><li>Годовой календарь</li><li>2 консультации</li></ul></article>
+      </div>
+    </section>
+
+    <section class="shell lead" id="lead">
+      <div>
+        <div class="eyebrow">Заявка</div>
+        <h2>Получить персональный разбор</h2>
+        <p>Оставьте контакт и запрос. Приложение сформирует сообщение, которое можно отправить в Telegram или на почту.</p>
+      </div>
+      <div class="card">
+        <form id="leadForm">
+          <div class="form-row"><label for="leadName">Имя</label><input id="leadName" required placeholder="Ваше имя" /></div>
+          <div class="form-row"><label for="leadContact">Контакт</label><input id="leadContact" required placeholder="Telegram, телефон или email" /></div>
+          <div class="form-row"><label for="leadRequest">Запрос</label><textarea id="leadRequest" rows="4" placeholder="Что хотите понять: деньги, отношения, предназначение, год?"></textarea></div>
+          <div class="actions"><button class="btn" type="submit">Сформировать заявку</button><a class="btn secondary" id="telegramLink" href="https://t.me/dimachekmarev" target="_blank" rel="noopener">Telegram</a></div>
+        </form>
+        <div class="result-box" id="leadResult">После отправки здесь появится текст заявки.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <div class="brand"><div class="logo">N</div><span>NUMEROLOGIC</span></div>
+      <p>Персональная нумерология как цифровой продукт: расчет, интерпретация, заявка, PWA.</p>
+      <div class="legal"><a href="privacy.html">Политика конфиденциальности</a><a href="terms.html">Условия</a><a href="#calc">Калькулятор</a></div>
+    </div>
+  </footer>
+
+  <script src="main.js" defer></script>
+</body>
+</html>
