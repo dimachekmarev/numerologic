@@ -1,0 +1,15 @@
+{
+  "name": "NUMEROLOGIC — нумерологический навигатор по подписке",
+  "short_name": "NUMEROLOGIC",
+  "description": "RU PWA-сервис подписки на персональные нумерологические прогнозы, сильные даты и совместимость.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#08050d",
+  "theme_color": "#100b17",
+  "categories": ["lifestyle", "productivity"],
+  "lang": "ru",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
