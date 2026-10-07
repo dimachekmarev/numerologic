@@ -1,10 +1,12 @@
-import { Link } from 'react-router-dom'
-import { formatPrice } from '../data/products'
+import { Link } from "react-router-dom";
+import { formatPrice } from "../data/products";
 
 export default function ProductCard({ product, compact = false }) {
-  if (!product) return null
+  if (!product) return null;
   return (
-    <article className={`product-card tint-${product.tint || product.category || 'peach'}`}>
+    <article
+      className={`product-card tint-${product.tint || product.category || "peach"}`}
+    >
       <div className="card-topline">
         <span className="chip">{product.badge}</span>
         <strong>{formatPrice(product.price)}</strong>
@@ -18,9 +20,16 @@ export default function ProductCard({ product, compact = false }) {
           ))}
         </ul>
       )}
-      <Link to={`/products/${product.slug}`} className="card-link">
-        Подробнее
+      <Link
+        to={
+          product.category === "practice"
+            ? `/practices/${product.slug}`
+            : `/products/${product.slug}`
+        }
+        className="ghost-button"
+      >
+        Посмотреть материал ↗
       </Link>
     </article>
-  )
+  );
 }

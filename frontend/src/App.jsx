@@ -1,19 +1,27 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import Layout from './components/Layout'
-import Home from './pages/Home'
-import Quiz from './pages/Quiz'
-import Result from './pages/Result'
-import Dashboard from './pages/Dashboard'
-import Products from './pages/Products'
-import ProductDetail from './pages/ProductDetail'
-import Club from './pages/Club'
-import Compatibility from './pages/Compatibility'
-import Report from './pages/Report'
-import Checkout from './pages/Checkout'
-import CheckoutSuccess from './pages/CheckoutSuccess'
-import CheckoutCancel from './pages/CheckoutCancel'
-import Faq from './pages/Faq'
-import './App.css'
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Layout from "./components/Layout";
+import Home from "./pages/Home";
+import Quiz from "./pages/Quiz";
+import Result from "./pages/Result";
+import Dashboard from "./pages/Dashboard";
+import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import Club from "./pages/Club";
+import Compatibility from "./pages/Compatibility";
+import Report from "./pages/Report";
+import Checkout from "./pages/Checkout";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
+import CheckoutCancel from "./pages/CheckoutCancel";
+import Faq from "./pages/Faq";
+import Today from "./pages/Today";
+import Journal from "./pages/Journal";
+import Practices, { Practice } from "./pages/Practices";
+import Calendar from "./pages/Calendar";
+import Goals from "./pages/Goals";
+import Assistant from "./pages/Assistant";
+import Account from "./pages/Account";
+import ResetPassword from "./pages/ResetPassword";
+import "./App.css";
 
 function SimpleLegalPage({ title, children }) {
   return (
@@ -24,7 +32,7 @@ function SimpleLegalPage({ title, children }) {
         <div className="legal-copy">{children}</div>
       </article>
     </section>
-  )
+  );
 }
 
 export default function App() {
@@ -33,6 +41,15 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="today" element={<Today />} />
+          <Route path="journal" element={<Journal />} />
+          <Route path="practices" element={<Practices />} />
+          <Route path="practices/:slug" element={<Practice />} />
+          <Route path="calendar" element={<Calendar />} />
+          <Route path="goals" element={<Goals />} />
+          <Route path="assistant" element={<Assistant />} />
+          <Route path="account" element={<Account />} />
+          <Route path="reset-password" element={<ResetPassword />} />
           <Route path="quiz" element={<Quiz />} />
           <Route path="result" element={<Result />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -49,8 +66,16 @@ export default function App() {
             path="privacy"
             element={
               <SimpleLegalPage title="Политика конфиденциальности">
-                <p>Мы используем имя, дату рождения, ответы опроса и контактные данные только для подготовки разборов, сохранения результатов и обработки заказов.</p>
-                <p>Numerologic — инструмент саморефлексии. Данные не должны использоваться для медицинских, юридических, финансовых или иных профессиональных решений без консультации специалиста.</p>
+                <p>
+                  Мы используем имя, дату рождения, ответы опроса и контактные
+                  данные только для подготовки разборов, сохранения результатов
+                  и обработки заказов.
+                </p>
+                <p>
+                  Numerologic — инструмент саморефлексии. Данные не должны
+                  использоваться для медицинских, юридических, финансовых или
+                  иных профессиональных решений без консультации специалиста.
+                </p>
               </SimpleLegalPage>
             }
           />
@@ -58,8 +83,16 @@ export default function App() {
             path="terms"
             element={
               <SimpleLegalPage title="Условия использования">
-                <p>Сервис предоставляет нумерологические digital-разборы, мини-инсайты, совместимость и подписочные материалы в формате self-reflection продукта.</p>
-                <p>Разборы не являются предсказанием будущего и не заменяют профессиональные консультации. Решения пользователь принимает самостоятельно.</p>
+                <p>
+                  Сервис предоставляет нумерологические digital-разборы,
+                  мини-инсайты, совместимость и подписочные материалы в формате
+                  self-reflection продукта.
+                </p>
+                <p>
+                  Разборы не являются предсказанием будущего и не заменяют
+                  профессиональные консультации. Решения пользователь принимает
+                  самостоятельно.
+                </p>
               </SimpleLegalPage>
             }
           />
@@ -67,5 +100,5 @@ export default function App() {
         </Route>
       </Routes>
     </BrowserRouter>
-  )
+  );
 }

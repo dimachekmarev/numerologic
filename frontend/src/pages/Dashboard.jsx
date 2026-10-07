@@ -1,51 +1,111 @@
-import { Link } from 'react-router-dom'
-import ReportCard from '../components/ReportCard'
-
+import { Link } from "react-router-dom";
+import { api } from "../api";
+import { useLoad } from "../hooks";
+import Status from "../components/Status";
+import ReportCard from "../components/ReportCard";
 export default function Dashboard() {
-  const quiz = JSON.parse(localStorage.getItem('numerologic_quiz') || 'null')
-  const result = JSON.parse(localStorage.getItem('numerologic_result') || 'null')
-  const reports = JSON.parse(localStorage.getItem('numerologic_reports') || '[]')
-  const lastPayment = JSON.parse(localStorage.getItem('numerologic_last_payment') || 'null')
-
+  const state = useLoad(api.dashboard);
+  if (!state.data)
+    return (
+      <section className="section">
+        <Status {...state} />
+      </section>
+    );
+  const d = state.data,
+    p = d.user.profile;
+  const week = d.entries.slice(0, 7);
   return (
-    <section className="dashboard-page section">
+    <section className="section">
       <div className="section-heading split">
         <div>
-          <span className="eyebrow">Dashboard</span>
-          <h1>Ваш кабинет</h1>
-          <p>Для MVP dashboard читает localStorage и сохранённые reports, созданные mock checkout.</p>
+          <span className="eyebrow">Всё важное — здесь</span>
+          <h1>
+            {d.user.name === "Гость"
+              ? "Ваше пространство"
+              : `Здравствуйте, ${d.user.name}.`}
+          </h1>
+          <p>
+            Ваши записи, карта и материалы. Продолжайте с того места, где
+            остановились.
+          </p>
         </div>
-        <Link className="primary-button" to="/quiz">Новый мини-разбор</Link>
+        <Link className="secondary-button" to="/account">
+          Аккаунт ↗
+        </Link>
       </div>
       <div className="dashboard-grid">
-        <article className="soft-card widget">
-          <span className="chip">Профиль</span>
-          <h2>{quiz?.name || 'Гость Numerologic'}</h2>
-          <p>{quiz?.birth_date || 'Дата рождения не указана'}</p>
-          <div className="numbers-row small">
-            <div><strong>{result?.profile?.life_path || '—'}</strong><span>путь</span></div>
-            <div><strong>{result?.profile?.month || '—'}</strong><span>месяц</span></div>
-          </div>
+        <article className="soft-card feature-card">
+          <span className="chip">Карта чисел</span>
+          {p ? (
+            <>
+              <div className="numbers-row">
+                <div>
+                  <strong>{p.life_path}</strong>
+                  <span>путь</span>
+                </div>
+                <div>
+                  <strong>{p.month}</strong>
+                  <span>месяц</span>
+                </div>
+              </div>
+              <p>{p.arithmetic}</p>
+              <small>{p.system}</small>
+            </>
+          ) : (
+            <p>Пройдите бесплатный мини-разбор.</p>
+          )}
+          <Link className="ghost-button" to="/quiz">
+            Обновить профиль
+          </Link>
         </article>
-        <article className="soft-card widget tint-lavender">
-          <span className="chip sage">Коммерческий flow</span>
-          <h2>{lastPayment ? 'Оплата прошла' : 'Оплат пока нет'}</h2>
-          <p>{lastPayment ? `Order #${lastPayment.order_id}` : 'Пройдите checkout, чтобы создать report.'}</p>
-          <Link className="ghost-button" to="/products">К продуктам</Link>
+        <article className="soft-card feature-card">
+          <span className="chip">Обзор записей</span>
+          <h2>{week.length} наблюдений</h2>
+          <p>
+            {week.filter((e) => e.done).length} отмеченных шагов в последних
+            семи записях.
+          </p>
+          <p>Подумайте: что поддерживало вас и что стоит повторить?</p>
+          <Link className="ghost-button" to="/journal">
+            Вернуться к дневнику
+          </Link>
         </article>
-        <article className="soft-card widget tint-sage">
-          <span className="chip">Club</span>
-          <h2>Numerologic Club</h2>
-          <p>Mock-подписка доступна через страницу клуба или checkout продукта Club.</p>
-          <Link className="ghost-button" to="/club">Открыть клуб</Link>
+        <article className="soft-card feature-card tint-lavender">
+          <span className="chip">
+            {d.club ? "Клуб открыт" : "Numerologic Club"}
+          </span>
+          <h2>{d.club ? "В вашем темпе." : "Поддержка каждый день."}</h2>
+          <p>
+            {d.club
+              ? `Доступ до ${new Date(d.expires).toLocaleDateString("ru-RU")}.`
+              : "Все практики и AI-помощник. 1 000 ₽ за 30 дней."}
+          </p>
+          <Link className="ghost-button" to={d.club ? "/assistant" : "/club"}>
+            {d.club ? "Поговорить с помощником" : "Посмотреть клуб"} ↗
+          </Link>
         </article>
       </div>
-      <div className="section-heading">
-        <h2>Reports</h2>
+      <div className="section-heading section">
+        <h2>Ваши материалы</h2>
+        <p>Разовые покупки остаются в кабинете после окончания клуба.</p>
       </div>
       <div className="reports-grid">
-        {reports.length ? reports.map((report) => <ReportCard key={report.id} report={report} />) : <p>Пока нет сохранённых отчётов. После mock-success отчёт появится здесь.</p>}
+        {d.reports.map((r) => (
+          <ReportCard key={r.id} report={r} />
+        ))}
+        {!d.reports.length && (
+          <article className="soft-card feature-card">
+            <h3>Начните с бесплатной практики</h3>
+            <p>
+              Сначала попробуйте первый день — выберите материал по своему
+              запросу.
+            </p>
+            <Link className="primary-button" to="/practices">
+              Выбрать практику
+            </Link>
+          </article>
+        )}
       </div>
     </section>
-  )
+  );
 }

@@ -1,0 +1,21 @@
+{
+  "name": "numerologic",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-hosted.mjs",
+    "test:hosted": "node --test hosting/tests/*.test.mjs",
+    "dev:hosted": "node hosting/dev.mjs",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "dejavu-fonts-ttf": "^2.37.3",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.0",
+    "drizzle-orm": "^0.44.0",
+    "esbuild": "^0.25.0"
+  }
+}

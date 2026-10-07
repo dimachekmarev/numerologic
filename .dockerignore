@@ -1,0 +1,12 @@
+.git
+**/node_modules
+**/dist
+**/__pycache__
+**/*.db
+**/*.sqlite3*
+**/.env
+**/.env.*
+**/tests
+legacy-static
+*.zip
+docs/screenshots

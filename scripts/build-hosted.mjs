@@ -1,0 +1,14 @@
+import { build } from 'esbuild';
+import { rm, mkdir, cp, readFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+execFileSync('npm',['run','build','--prefix','frontend'],{stdio:'inherit',env:{...process.env,GITHUB_PAGES:'false',VITE_API_BASE_URL:''}});
+await rm('dist',{recursive:true,force:true});
+await mkdir('dist/server',{recursive:true});
+await mkdir('dist/.openai',{recursive:true});
+await cp('frontend/dist','dist/client',{recursive:true});
+await cp('.openai/hosting.json','dist/.openai/hosting.json');
+await cp('drizzle','dist/.openai/drizzle',{recursive:true});
+await build({entryPoints:['hosting/worker.mjs'],outfile:'dist/server/index.js',bundle:true,format:'esm',platform:'browser',target:'es2022',loader:{'.ttf':'binary'},minify:true});
+const code=await readFile('dist/server/index.js','utf8');
+if(!code.includes('fetch')) throw new Error('Missing Worker fetch handler');
+console.log('Numerologic: React assets, D1 migrations and full API built.');

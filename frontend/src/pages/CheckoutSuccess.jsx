@@ -1,54 +1,91 @@
-import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { api } from '../api'
-
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { api } from "../api";
 export default function CheckoutSuccess() {
-  const [params] = useSearchParams()
-  const orderId = params.get('order_id') || localStorage.getItem('numerologic_last_order_id')
-  const [state, setState] = useState({ loading: true, result: null, error: '' })
-
+  const [params] = useSearchParams(),
+    id = params.get("order_id"),
+    [state, setState] = useState({ loading: true, data: null, error: "" }),
+    [attempt, setAttempt] = useState(0);
   useEffect(() => {
-    let alive = true
-    if (!orderId) {
-      setState({ loading: false, result: null, error: 'Order id не найден' })
-      return
+    let alive = true,
+      timer,
+      tries = 0;
+    async function check() {
+      try {
+        const cfg = await api.config();
+        const data = cfg.test_mode
+          ? await api.mockSuccess(id)
+          : await api.order(id);
+        if (!alive) return;
+        setState({ loading: false, data, error: "" });
+        if (data.status === "pending" && tries++ < 12)
+          timer = setTimeout(check, 5000);
+      } catch (e) {
+        if (alive) setState({ loading: false, data: null, error: e.message });
+      }
     }
-    api.mockSuccess(orderId)
-      .then((result) => {
-        if (!alive) return
-        localStorage.setItem('numerologic_last_payment', JSON.stringify(result))
-        if (result.report_id) {
-          localStorage.setItem('numerologic_last_report_id', String(result.report_id))
-        }
-        setState({ loading: false, result, error: '' })
-      })
-      .catch((error) => alive && setState({ loading: false, result: null, error: error.message }))
-    return () => { alive = false }
-  }, [orderId])
-
+    if (id) check();
+    else
+      setTimeout(() => {
+        if (alive)
+          setState({
+            loading: false,
+            data: null,
+            error: "Не указан номер заказа",
+          });
+      }, 0);
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
+  }, [id, attempt]);
   return (
-    <section className="narrow-page success-page">
-      <article className="soft-card">
-        <span className="chip sage">Success</span>
-        {state.loading ? (
-          <h1>Подтверждаем mock-платёж...</h1>
-        ) : state.error ? (
-          <>
-            <h1>Не удалось подтвердить заказ</h1>
-            <p>{state.error}</p>
-            <Link className="secondary-button" to="/checkout">Вернуться в checkout</Link>
-          </>
-        ) : (
-          <>
-            <h1>Mock-платёж прошёл</h1>
-            <p>Заказ #{state.result.order_id} отмечен как paid. Backend создал {state.result.report_id ? 'полный report' : 'подписку Numerologic Club'}.</p>
-            <div className="hero-actions">
-              {state.result.report_id && <Link className="primary-button" to={`/report/${state.result.report_id}`}>Открыть отчёт</Link>}
-              <Link className="secondary-button" to="/dashboard">В dashboard</Link>
-            </div>
-          </>
+    <section className="section narrow-page">
+      <article className="soft-card feature-card">
+        <span className="chip">Статус заказа</span>
+        <h1>
+          {state.loading
+            ? "Проверяем оплату…"
+            : state.data?.status === "paid"
+              ? "Ваш материал готов."
+              : state.data?.status === "canceled"
+                ? "Платёж отменён."
+                : "Ждём подтверждение."}
+        </h1>
+        {state.error && <p role="alert">{state.error}</p>}
+        {state.data?.status === "pending" && (
+          <p>
+            Если оплатили, подождите немного. Мы проверяем статус у платёжного
+            сервиса.
+          </p>
         )}
+        <div className="hero-actions">
+          {state.data?.report_id && (
+            <Link
+              className="primary-button"
+              to={`/report/${state.data.report_id}`}
+            >
+              Открыть материал
+            </Link>
+          )}
+          {state.data?.subscription_id && (
+            <Link className="primary-button" to="/practices">
+              Все практики открыты
+            </Link>
+          )}
+          <Link className="secondary-button" to="/dashboard">
+            В кабинет
+          </Link>
+          {state.data?.status !== "paid" && (
+            <button
+              className="ghost-button"
+              onClick={() => setAttempt((x) => x + 1)}
+            >
+              Проверить ещё раз
+            </button>
+          )}
+        </div>
       </article>
     </section>
-  )
+  );
 }

@@ -1,40 +1,69 @@
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { api } from '../api'
-import { reportBlocks } from '../data/reportTemplates'
-
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { api, API_BASE } from "../api";
+import { useLoad } from "../hooks";
+import Status from "../components/Status";
 export default function Report() {
-  const { id } = useParams()
-  const [report, setReport] = useState(null)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    api.report(id)
-      .then((data) => {
-        setReport(data)
-        const reports = JSON.parse(localStorage.getItem('numerologic_reports') || '[]')
-        if (!reports.some((item) => item.id === data.id)) {
-          localStorage.setItem('numerologic_reports', JSON.stringify([data, ...reports].slice(0, 12)))
-        }
-      })
-      .catch((err) => setError(err.message))
-  }, [id])
-
-  if (error) {
-    return <section className="narrow-page empty-state"><h1>Отчёт не найден</h1><p>{error}</p><Link to="/products">Выбрать продукт</Link></section>
+  const { id } = useParams(),
+    state = useLoad(() => api.report(id), [id]),
+    [reflection, setReflection] = useState(""),
+    [busy, setBusy] = useState(false);
+  async function discuss() {
+    setBusy(true);
+    try {
+      const r = await api.discuss(id);
+      setReflection(r.reply);
+    } catch (e) {
+      setReflection(e.message);
+    } finally {
+      setBusy(false);
+    }
   }
-  if (!report) return <section className="narrow-page empty-state"><h1>Загружаем report...</h1></section>
-
+  if (!state.data)
+    return (
+      <section className="section">
+        <Status {...state} />
+      </section>
+    );
+  const r = state.data;
   return (
-    <section className="report-page narrow-page">
-      <article className="soft-card report-document">
-        <span className="chip sage">Полный report</span>
-        <h1>{report.title}</h1>
-        <div className="report-blocks">
-          {reportBlocks.map((block) => <span key={block}>{block}</span>)}
+    <section className="section narrow-page">
+      <div className="section-heading">
+        <Link to="/dashboard">← Кабинет</Link>
+        <span className="chip">Ваш материал</span>
+        <h1>{r.title}</h1>
+        <div className="hero-actions">
+          <a
+            className="primary-button"
+            href={`${API_BASE}/api/reports/${id}/pdf`}
+          >
+            Скачать PDF ↓
+          </a>
+          <Link className="secondary-button" to="/journal">
+            Открыть дневник
+          </Link>
         </div>
-        <pre>{report.content}</pre>
+      </div>
+      <article className="soft-card report-document">
+        {r.content.split("\n\n").map((paragraph, i) => (
+          <p key={i}>{paragraph}</p>
+        ))}
+      </article>
+      <article className="soft-card feature-card" style={{ marginTop: 24 }}>
+        <h2>Применить к своей ситуации.</h2>
+        <p>
+          AI из клуба поможет связать материал с вашим дневником. Одно сообщение
+          из дневного лимита.
+        </p>
+        <button className="secondary-button" onClick={discuss} disabled={busy}>
+          {busy ? "Готовим ответ…" : "Обсудить с AI"}
+        </button>
+        {reflection && (
+          <p className="entry-text" role="status">
+            {reflection}
+          </p>
+        )}
       </article>
     </section>
-  )
+  );
 }

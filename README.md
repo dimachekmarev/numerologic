@@ -1,175 +1,120 @@
-# NUMEROLOGIC
+# Numerologic · личное пространство
 
-Рабочий MVP/PWA для продажи нумерологических digital-разборов: бесплатный мини-разбор, каталог продуктов, совместимость, Numerologic Club, mock checkout, отчёты и личный кабинет.
+Версия 2.1: React + облачный Worker/D1 на одном домене. FastAPI + SQLite сохранены для самостоятельного размещения и подключения платёжных провайдеров. Продажи реальными деньгами включаются только после настройки платёжного провайдера и продавца.
 
-## Статус
+## Онлайн-приложение
 
-Проект внедряется в существующий репозиторий `/root/web-projects/numerologic`.
+https://numerologic.dimachek777.chatgpt.site
 
-Старые статические файлы сохранены в `legacy-static/`. Новый рабочий frontend находится в `frontend/`, backend — в `backend/`.
+Доступ к опубликованной версии пока открыт владельцу через ChatGPT. Внутри сохраняются реальные аккаунты, дневник, цели и прогресс в постоянной D1-базе. Покупки в этой версии тестовые: деньги не списываются. AI включится после настройки серверного ключа; ответы не подменяются шаблонами. Приём оплаты подключается отдельным этапом.
 
-## Архитектура
+`hosting/` содержит Worker API; `db/schema.ts` и неизменяемые `drizzle/` миграции — облачную схему. `npm ci && npm ci --prefix frontend && npm run build` собирает весь онлайн-продукт. `npm run test:hosted` проверяет API с настоящей локальной SQLite; `npm run dev:hosted` запускает локальную копию облачного приложения. Миграции в production применяет Sites до выкладки кода.
 
-- `frontend/` — Vite + React + React Router, светлый Stitch-inspired UI.
-- `backend/` — FastAPI + SQLAlchemy + SQLite, API продуктов, quiz, reports, orders, mock payment.
-- `docs/plans/2026-06-03-stitch-integration-agent-task.md` — ТЗ агенту на внедрение.
-- `legacy-static/` — резерв старой статической PWA-версии.
+Дневник поддерживает выбор даты, редактирование прошлых записей и поиск по отображаемой истории. Данные можно экспортировать целиком. Профиль редактируется в аккаунте. Поддерживаются установка на главный экран и оболочка без интернета; чтение и запись личных данных требуют соединения.
 
-## Основные маршруты frontend
+## Что реализовано
 
-- `/` — лендинг
-- `/quiz` — мини-опрос
-- `/result` — бесплатный мини-разбор
-- `/dashboard` — личный кабинет
-- `/products` — каталог продуктов
-- `/products/:slug` — страница продукта
-- `/club` — Numerologic Club
-- `/compatibility` — совместимость пары
-- `/report/:id` — полный отчёт
-- `/checkout` — оформление заказа
-- `/checkout/success` — mock-success
-- `/checkout/cancel` — cancel
-- `/faq` — доверие/FAQ
-- `/privacy` — приватность
-- `/terms` — условия
+- Многостраничное пространство: «Сегодня», практики, дневник, цели, календарь, AI, кабинет, библиотека, аккаунт.
+- Прозрачный расчёт 1–9, включая 11→2, 22→4, 33→6. Проверка реальных дат. Таро как символический вопрос, календарный солнечный знак; без выдуманной натальной карты.
+- Гостевой вход, email/пароль, серверные HttpOnly-сессии, выход, Telegram Mini App auth с проверкой подписи, восстановление пароля через SMTP.
+- Четыре авторских самостоятельных практикума на 7/14 дней: границы, ясность, диалог, фокус. Первый день бесплатный, прогресс сохраняется.
+- Кабинет с серверными записями и покупками, личный календарь, экспорт и удаление данных.
+- Разовые покупки от 390 ₽, клуб 1 000 ₽ / 30 дней с ручным продлением. Все практикумы в клубе; разовые покупки сохраняют доступ после окончания клуба.
+- Реальные адаптеры Яндекс Пэй/Сплит и ЮKassa. Заказы, чеки, проверка суммы, владельца и статуса, повторные уведомления без повторной выдачи. Тестовая оплата недоступна в production.
+- PDF с кириллицей, защищённый владельцем отчёта.
+- AI с сохранённой историей диалога, профилем и семью последними записями, до 10 запросов в день; отдельные вопрос дня и обсуждение отчёта. Ответы дня кэшируются. Без ключа AI явно недоступен, не имитируется.
+- События воронки, административные метрики, transactional outbox в n8n/CRM: HMAC, event ID, восемь попыток доставки и backoff. Без имён, дат рождения и дневника в аналитике.
+- Адаптивный интерфейс, reduced-motion, загрузки и ошибки, доступность с клавиатуры.
 
-## Продукты
+## Открыть готовую локальную версию
 
-Редактируются во frontend:
+Архив `Numerologic_ready_2026-10-06.zip` содержит собранный интерфейс. Распакуйте и откройте `start.command` на Mac или запустите `python3 launch.py`. Первый запуск требует интернет и Python 3.10+. Node.js для архива не нужен. Данные и секрет сессий сохраняются отдельно от исходников между запусками.
 
-`frontend/src/data/products.js`
+В launcher включён явно обозначенный деморежим: все покупки тестовые, деньги не списываются. Подключение оплаты — отдельный этап по указанию владельца. AI требует серверный `AI_API_KEY`, восстановление пароля — SMTP. Без них соответствующие интеграции не имитируются. Для постоянного онлайн-доступа с нескольких устройств используйте Docker на вашем сервере. Подробнее: OPEN_ME.md.
 
-И в backend-каталоге:
-
-`backend/main.py` → `PRODUCT_CATALOG`, `ADDON_CATALOG`
-
-Текущие продукты:
-
-- Личный разбор
-- Глубокий разбор
-- Совместимость пары
-- Период жизни
-- Деньги и реализация
-- Любовный сценарий
-- Годовой прогноз
-- Numerologic Club
-
-Допы:
-
-- PDF-версия отчёта
-- Разбор партнёра
-- Любовный сценарий
-- Денежный код
-- Годовой период
-- Вопрос к текущей ситуации
-- Подарочная версия
-- Аудио-выжимка
-- Numerologic Club со скидкой
-
-## Backend env
-
-Скопировать:
+## Быстрый запуск
 
 ```bash
-cp backend/.env.example backend/.env
+python -m pip install -r backend/requirements.txt
+npm ci --prefix frontend
+npm run build --prefix frontend
+cd backend
+# Постоянный секрет сохраняет сессии после перезапуска.
+SESSION_SECRET=your-local-secret-at-least-32-characters FRONTEND_BASE_URL=http://127.0.0.1:8080 python -m uvicorn main:app --host 127.0.0.1 --port 8080
 ```
 
-Ключевые переменные:
+Открыть `http://127.0.0.1:8080`. Оплата выключена по умолчанию. Для локальной проверки покупки добавить `PAYMENT_PROVIDER=mock`; реальные деньги не списываются.
 
-```env
-DATABASE_URL=sqlite:////root/web-projects/numerologic/backend/numerologic.db
-JWT_SECRET_KEY=change-me-in-production
-PAYMENT_PROVIDER=mock
-PAYMENT_CURRENCY=RUB
-FRONTEND_BASE_URL=http://localhost:5173
+Для разработки: backend на 8080, `npm run dev --prefix frontend` на 5173, `FRONTEND_BASE_URL=http://localhost:5173`. Vite проксирует `/api`.
+
+## Production: Docker + HTTPS
+
+1. Скопировать `backend/.env.example` в `backend/.env` и заполнить параметры.
+2. Установить `APP_ENV=production`, постоянный `SESSION_SECRET`, `FRONTEND_BASE_URL=https://ваш-домен`.
+3. В корневом `.env` установить `APP_DOMAIN=ваш-домен`; DNS домена должен указывать на сервер.
+4. `docker compose up -d --build`.
+
+Caddy выпускает HTTPS-сертификат. База сохраняется в volume `product-data`. Запускается один worker: для SQLite и фонового обработчика. Не масштабировать этот контейнер горизонтально без переноса базы, распределённых лимитов и выделенного worker.
+
+## Подключение оплаты
+
+### Яндекс Пэй и Сплит
+
+- `PAYMENT_PROVIDER=yandex`, `YANDEX_PAY_MERCHANT_ID`, `YANDEX_PAY_API_KEY`.
+- Сначала `YANDEX_PAY_SANDBOX=true`, после приёмочных тестов — `false`.
+- Продавец: `SELLER_NAME`, `SUPPORT_EMAIL`; проверьте свой `YANDEX_PAY_TAX_CODE` и фискализацию в кабинете.
+- Callback base URL: `https://ваш-домен/api/payments/yandex`; сервис принимает `/v1/webhook`.
+- Входящий JWT проверяется по ES256 и официальному JWKS, времени и merchant ID. Затем заказ ещё раз проверяется через API. Доступ выдаётся только при `CAPTURED`, правильной сумме и валюте.
+- Карта и Сплит передаются как доступные методы. Доступность Сплита для конкретного покупателя определяется Яндексом и условиями магазина.
+- Поддерживается базовая механика с автоматическим списанием в настройках продавца. Двухстадийное ручное списание и рекуррентные списания не реализованы.
+
+### ЮKassa
+
+- `PAYMENT_PROVIDER=yookassa`, `YOOKASSA_SHOP_ID`, `YOOKASSA_SECRET_KEY`.
+- Webhook: `https://ваш-домен/api/payments/webhook`, события `payment.succeeded` и `refund.succeeded`.
+- Уведомление служит сигналом: статус, сумма и order metadata повторно проверяются через авторизованный API.
+- Receipt включён по умолчанию; для email-чека пользователь сохраняет аккаунт. Укажите налоговую ставку своего продавца.
+
+Страница успеха сама по себе не подтверждает оплату. Фоновый процесс восстанавливает pending-заказы каждую минуту. Возвраты выполняются в кабинете провайдера. При подтверждённом полном возврате через webhook доступ к материалу/клубу отзывается. Частичный возврат не отзывает доступ.
+
+## AI
+
+`AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL` — серверные переменные. Используется совместимый с OpenAI Chat Completions endpoint. Модель можно заменить на поддерживаемую вашим провайдером. Не вставлять ключи во frontend. Проверить доступность провайдера из региона сервера, тариф и условия обработки данных.
+
+Арифметика рассчитывается кодом. AI помогает интерпретировать и применять материал к дневнику. Инструменты не являются психологической диагностикой или терапией.
+
+## n8n / CRM
+
+Установить `FUNNEL_WEBHOOK_URL=https://...` и `FUNNEL_WEBHOOK_SECRET`. Тело:
+
+```json
+{"id":"order-paid-123","event":"order_paid","created_at":"...","properties":{"order_id":123,"product":"club","amount_rub":1000}}
 ```
 
-Для реальной оплаты позже заполнить placeholders YooKassa/CloudPayments в `backend/.env.example` и реализовать provider/webhook.
+Проверить `X-Numerologic-Signature` (`sha256=HMAC(secret, rawBody)`), дедуплицировать `X-Numerologic-Event-ID`. Не использовать эти события для отправки писем/сообщений без отдельного согласия получателя. В приложении рассылка пользователям не включена.
 
-## Frontend env
+Метрики: `GET /api/admin/metrics`, доступ только зарегистрированным email из `ADMIN_EMAILS`.
+
+## Проверка
 
 ```bash
-cp frontend/.env.example frontend/.env
+python -m pip install -r backend/requirements-dev.txt
+python -m pytest backend/tests -q
+python -m ruff check backend
+npm run lint --prefix frontend
+npm run build --prefix frontend
+cd frontend
+npx playwright install chromium
+# Запустить backend с PAYMENT_PROVIDER=mock и FRONTEND_BASE_URL=http://127.0.0.1:8080
+npm run test:e2e
 ```
 
-```env
-VITE_API_BASE_URL=http://localhost:8080
-```
+CI проверяет backend, lint, build и полный сценарий браузера с 12 мобильными маршрутами. Снимки интерфейса сохраняются в `docs/screenshots`.
 
-## Локальный запуск
+## Важное для релиза
 
-Backend:
+GitHub Pages обслуживает только frontend и не запускает FastAPI. Для рабочего продукта нужен backend и HTTPS на одном домене (см. Docker). Старый Pages workflow сохранён для истории текущего проекта; новый код находится в отдельной ветке, чтобы не сломать действующий сайт автоматической выкладкой.
 
-```bash
-cd /root/web-projects/numerologic/backend
-python -m pip install -r requirements.txt
-python -m uvicorn main:app --host 127.0.0.1 --port 8080
-```
+Старая база и Python cache удалены из отслеживаемых файлов. Используется новая схема `product.sqlite3`; старые данные не импортированы автоматически. Если в прежней базе есть реальные пользователи/заказы, нужен отдельный перенос без потери записей.
 
-Frontend:
-
-```bash
-cd /root/web-projects/numerologic/frontend
-npm install
-npm run dev -- --host 127.0.0.1 --port 5173
-```
-
-Открыть:
-
-`http://127.0.0.1:5173`
-
-## Production build
-
-```bash
-cd /root/web-projects/numerologic/frontend
-npm run build
-npm run preview -- --host 127.0.0.1 --port 5173
-```
-
-Проверка backend:
-
-```bash
-curl http://127.0.0.1:8080/api/health
-curl http://127.0.0.1:8080/api/products
-```
-
-## Mock payment flow
-
-1. Пользователь проходит `/quiz`.
-2. Получает `/result`.
-3. Выбирает продукт в `/products` или `/club`.
-4. Переходит в `/checkout`.
-5. Backend создаёт `Order` со статусом `pending`.
-6. `/checkout/success` вызывает `/api/checkout/mock-success`.
-7. Backend помечает заказ `paid`.
-8. Для paid order создаётся report или subscription.
-9. Пользователь открывает `/report/:id` или `/dashboard`.
-
-## API
-
-Основные endpoints:
-
-- `GET /api/health`
-- `GET /api/products`
-- `GET /api/products/{slug}`
-- `POST /api/quiz/complete`
-- `POST /api/reports/preview`
-- `GET /api/reports/{id}`
-- `POST /api/checkout/create`
-- `POST /api/checkout/mock-success`
-- `POST /api/subscriptions/create`
-- `POST /api/compatibility/preview`
-- `POST /api/payments/webhook`
-
-## Юридическая подача
-
-Numerologic подаётся как инструмент саморефлексии, развлечения и мягкого планирования. Нельзя обещать гарантированный доход, лечение, судьбоносные предсказания или замену врача, психолога, юриста или финансового консультанта.
-
-## Что осталось для продаж в интернете
-
-- Подключить реальную оплату: YooKassa / CloudPayments / Prodamus.
-- Настроить production env.
-- Развернуть backend на VPS/Render/Fly/другом сервере.
-- Развернуть frontend на Vercel/Netlify/Cloudflare Pages или на том же VPS.
-- Подключить домен.
-- Добавить Яндекс.Метрику/GA4 и цели checkout.
+До публичных продаж: подключить платёжные и AI ключи, SMTP, сервер/домен, реальные реквизиты продавца и условия возвратов. Проверить реальные sandbox-сценарии Яндекса и ЮKassa. Шаблонные страницы условий не заменяют реквизиты продавца.
