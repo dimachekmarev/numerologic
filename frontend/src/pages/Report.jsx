@@ -6,6 +6,7 @@ import Status from "../components/Status";
 export default function Report() {
   const { id } = useParams(),
     state = useLoad(() => api.report(id), [id]),
+    config = useLoad(api.config),
     [reflection, setReflection] = useState(""),
     [busy, setBusy] = useState(false);
   async function discuss() {
@@ -55,9 +56,18 @@ export default function Report() {
           AI из клуба поможет связать материал с вашим дневником. Одно сообщение
           из дневного лимита.
         </p>
-        <button className="secondary-button" onClick={discuss} disabled={busy}>
+        <button
+          className="secondary-button"
+          onClick={discuss}
+          disabled={busy || !config.data?.ai_enabled}
+        >
           {busy ? "Готовим ответ…" : "Обсудить с AI"}
         </button>
+        {!config.data?.ai_enabled && (
+          <Link className="ghost-button" to="/assistant">
+            Выбрать упражнение ↗
+          </Link>
+        )}
         {reflection && (
           <p className="entry-text" role="status">
             {reflection}

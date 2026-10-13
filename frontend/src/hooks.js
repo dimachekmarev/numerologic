@@ -4,6 +4,7 @@ export function useLoad(loader, deps = []) {
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     let alive = true;
+    setState({ loading: true, data: null, error: "" });
     loader()
       .then((data) => {
         if (alive) setState({ loading: false, data, error: "" });

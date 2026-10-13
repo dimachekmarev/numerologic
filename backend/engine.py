@@ -21,6 +21,9 @@ MEANINGS = {
     7: "наблюдение",
     8: "ресурсы",
     9: "завершение",
+    11: "вдохновение и чувствительность",
+    22: "замысел и воплощение",
+    33: "поддержка и зрелая забота",
 }
 PRACTICES = {
     1: "Выберите один небольшой шаг и сделайте его за 15 минут.",
@@ -59,9 +62,9 @@ TAROT = [
 ]
 
 
-def reduce_number(value):
+def reduce_number(value, preserve_masters=False):
     n = sum(int(c) for c in str(value) if c.isdigit())
-    while n > 9:
+    while n > 9 and not (preserve_masters and n in (11, 22, 33)):
         n = sum(int(c) for c in str(n))
     return n or 1
 
@@ -89,7 +92,7 @@ def name_number(name, mode="all"):
         if c in mapping
         and (mode == "all" or (c in vowels if mode == "vowels" else c not in vowels))
     ]
-    return reduce_number(sum(mapping[c] for c in chars))
+    return reduce_number(sum(mapping[c] for c in chars), preserve_masters=True)
 
 
 def calc_profile(name, birth_date, today=None):
@@ -100,15 +103,17 @@ def calc_profile(name, birth_date, today=None):
     return dict(
         name=name,
         birth_date=birth_date,
-        life_path=reduce_number(birth_date),
+        life_path=reduce_number(birth_date, preserve_masters=True),
+        base_path=reduce_number(birth_date),
+        birthday=reduce_number(born.day, preserve_masters=True),
         destiny=name_number(name),
         soul=name_number(name, "vowels"),
         personality=name_number(name, "consonants"),
         year=year,
         month=reduce_number(year + today.month),
-        meaning=MEANINGS[reduce_number(birth_date)],
-        arithmetic=" + ".join(map(str, digits)) + f" = {sum(digits)} → {reduce_number(birth_date)}",
-        system="Цифровая редукция 1–9; 11 → 2, 22 → 4, 33 → 6. Буквы: отдельные русский и латинский алфавиты, цикл 1–9.",
+        meaning=MEANINGS[reduce_number(birth_date, preserve_masters=True)],
+        arithmetic=" + ".join(map(str, digits)) + f" = {sum(digits)} → {reduce_number(birth_date, preserve_masters=True)}",
+        system="Мастер-числа 11, 22 и 33 сохраняются в карте; периоды сводятся к 1–9. Буквы: отдельные русский и латинский алфавиты, цикл 1–9.",
     )
 
 

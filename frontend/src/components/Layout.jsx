@@ -24,6 +24,9 @@ export default function Layout() {
       <footer className="site-footer">
         <p>Numerologic · пространство саморефлексии</p>
         <nav>
+          <Link to="/numbers">Моя карта</Link>
+          <Link to="/weekly">Моя неделя</Link>
+          <Link to="/assistant">Помощник</Link>
           <Link to="/compatibility">Совместимость</Link>
           <Link to="/products">Материалы</Link>
           <Link to="/club">Клуб</Link>

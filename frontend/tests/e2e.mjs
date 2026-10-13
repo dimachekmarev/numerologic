@@ -1,6 +1,7 @@
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
 import fs from "node:fs";
+fs.mkdirSync("../docs/screenshots", { recursive: true });
 const browser = await chromium.launch({
   headless: true,
   executablePath: process.env.E2E_BROWSER_PATH,
@@ -52,17 +53,15 @@ await page.goto(base + "/practices/boundaries");
 await page
   .getByRole("heading", { name: "Карта границ", exact: true })
   .waitFor();
-await page
-  .getByRole("link", { name: "Открыть практикум", exact: true })
-  .click();
-await page.locator("input[type=checkbox]").check();
-await page.getByRole("button", { name: "Проверить тестовую покупку" }).click();
-await page.getByRole("heading", { name: "Ваш материал готов." }).waitFor();
-await page.getByRole("link", { name: "Открыть материал", exact: true }).click();
-await page.getByRole("link", { name: "Скачать PDF ↓" }).waitFor();
-await page.goto(base + "/practices/boundaries");
+await page.getByRole("button", { name: "Начать 7 дней бесплатно" }).click();
 await page.getByRole("heading", { name: "Закрепляем", exact: true }).waitFor();
 await page.locator("input[type=checkbox]").first().check();
+await page.goto(base + "/products/deep-reading");
+await page.getByRole("button", { name: "Открыть материал и PDF" }).click();
+await page.waitForURL("**/report/*");
+await page.getByRole("link", { name: "Скачать PDF ↓" }).waitFor();
+await page.goto(base + "/numbers");
+await page.getByRole("link", { name: "Скачать карту PDF ↓" }).waitFor();
 await page.goto(base + "/today");
 await page.getByRole("heading", { name: "Сегодня — для вас." }).waitFor();
 await page.screenshot({
@@ -74,6 +73,8 @@ await mobile.setViewportSize({ width: 390, height: 844 });
 for (const route of [
   "/",
   "/today",
+  "/numbers",
+  "/weekly",
   "/journal",
   "/calendar",
   "/practices",
@@ -103,12 +104,12 @@ assert.deepEqual(errors, []);
 fs.writeFileSync(
   "../docs/e2e-result.json",
   JSON.stringify(
-    { full_flow: "passed", mobile_routes: 12, browser_errors: errors },
+    { full_flow: "passed", mobile_routes: 14, browser_errors: errors },
     null,
     2,
   ),
 );
 console.log(
-  "PASS: quiz → account → journal → goal → purchase → report → unlocked practice; 12 mobile routes, no overflow or browser exceptions",
+  "PASS: quiz → account → journal → goal → trial → report → unlocked practice; 14 mobile routes, no overflow or browser exceptions",
 );
 await browser.close();

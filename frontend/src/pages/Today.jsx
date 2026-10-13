@@ -5,6 +5,7 @@ import { useLoad } from "../hooks";
 import Status from "../components/Status";
 export default function Today() {
   const state = useLoad(api.today);
+  const config = useLoad(api.config);
   const [copied, setCopied] = useState(false);
   const [insight, setInsight] = useState("");
   const [busy, setBusy] = useState(false);
@@ -92,15 +93,24 @@ export default function Today() {
         </article>
       </div>
       <article className="soft-card feature-card" style={{ marginTop: 24 }}>
-        <span className="chip">AI-размышление</span>
+        <span className="chip">Вопрос для размышления</span>
         <h2>Что важно именно вам?</h2>
         <p>
           Персональное упражнение с учётом последних записей. Входит в клуб и
           использует одно сообщение дневного лимита.
         </p>
-        <button className="primary-button" onClick={reflect} disabled={busy}>
+        <button
+          className="primary-button"
+          onClick={reflect}
+          disabled={busy || !config.data?.ai_enabled}
+        >
           {busy ? "Подбираем вопрос…" : "Получить вопрос от AI"}
         </button>
+        {!config.data?.ai_enabled && (
+          <Link className="secondary-button" to="/assistant">
+            Выбрать бесплатное упражнение ↗
+          </Link>
+        )}
         {insight && (
           <p className="entry-text" role="status">
             {insight}
@@ -118,7 +128,7 @@ export default function Today() {
         </Link>
         <Link className="soft-card feature-card" to="/assistant">
           <h3>Поговорить с помощником ↗</h3>
-          <p>AI учитывает профиль и записи дневника.</p>
+          <p>Готовые упражнения и разговор с AI после подключения.</p>
         </Link>
       </div>
     </section>

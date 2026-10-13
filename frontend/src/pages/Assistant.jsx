@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { useLoad } from "../hooks";
 import Status from "../components/Status";
+import TrialAccess from "../components/TrialAccess";
 export default function Assistant() {
   const state = useLoad(api.dashboard),
     config = useLoad(api.config),
@@ -11,8 +12,10 @@ export default function Assistant() {
     [text, setText] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [remaining, setRemaining] = useState(null);
-  const allMessages = [...(history.data || []), ...messages];
+    [remaining, setRemaining] = useState(null),
+    [exercise, setExercise] = useState(null);
+  const enabled = config.data?.ai_enabled,
+    allowed = state.data?.club || state.data?.trial.active;
   async function send(e) {
     e.preventDefault();
     if (!text.trim() || busy) return;
@@ -28,7 +31,17 @@ export default function Assistant() {
       ]);
       setRemaining(result.remaining);
       setText("");
-      api.track("assistant_used");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function guide(focus) {
+    setBusy(true);
+    setError("");
+    try {
+      setExercise(await api.reflection(focus));
     } catch (e) {
       setError(e.message);
     } finally {
@@ -38,36 +51,80 @@ export default function Assistant() {
   return (
     <section className="section narrow-page">
       <div className="section-heading">
-        <span className="eyebrow">AI с контекстом</span>
-        <h1>Поговорим о важном?</h1>
+        <span className="eyebrow">Один вопрос. Один небольшой шаг.</span>
+        <h1>Что хочется прояснить?</h1>
         <p>
-          Помощник учитывает ваш профиль и семь последних записей дневника.
-          Отвечает бережно, помогает сформулировать вопрос и выбрать небольшой
-          шаг.
+          Выберите готовое упражнение или обсудите ситуацию с AI, когда он
+          подключён.
         </p>
       </div>
       <Status {...state} />
-      {state.data && !state.data.club ? (
+      <article className="soft-card feature-card">
+        <span className="chip">Упражнения доступны бесплатно</span>
+        <h2>Начните с того, что занимает мысли.</h2>
+        <div className="filter-row">
+          {[
+            ["clarity", "Ясность"],
+            ["boundaries", "Границы"],
+            ["dialogue", "Диалог"],
+            ["focus", "Фокус"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              disabled={busy || !state.data}
+              onClick={() => guide(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <small>Готовые упражнения из библиотеки. Это не ответы AI.</small>
+        {exercise && (
+          <div className="reflection-result">
+            <h3>{exercise.question}</h3>
+            <p>{exercise.exercise}</p>
+            <p>{exercise.context}</p>
+            {exercise.next_goal && (
+              <p>Ваш незавершённый шаг: {exercise.next_goal}</p>
+            )}
+            <div className="hero-actions">
+              <Link className="primary-button" to="/journal">
+                Записать ответ
+              </Link>
+              <Link
+                className="secondary-button"
+                to={`/practices/${exercise.practice}`}
+              >
+                Продолжить практику ↗
+              </Link>
+            </div>
+          </div>
+        )}
+      </article>
+      <div className="section-heading section">
+        <h2>Разговор с AI</h2>
+        <p>
+          Учитывает профиль и семь последних записей дневника. До десяти
+          сообщений в день.
+        </p>
+      </div>
+      <Status {...config} />
+      {config.data && !enabled ? (
         <article className="soft-card feature-card">
-          <h2>Ваш помощник в клубе</h2>
-          <p>До 10 сообщений в день. Все практикумы и обзор недели включены.</p>
-          <Link className="primary-button" to="/club">
-            Открыть клуб
-          </Link>
+          <h3>AI пока не подключён.</h3>
+          <p>
+            Разговор станет доступен после подключения провайдера. Сейчас можно
+            пользоваться упражнениями, картой, дневником и обзором недели.
+          </p>
         </article>
+      ) : state.data && !allowed ? (
+        <TrialAccess onChanged={state.reload} />
       ) : (
+        enabled &&
         state.data && (
           <>
             <div className="chat-window" aria-live="polite">
-              {!allMessages.length && (
-                <div className="soft-card">
-                  <p>
-                    Начните с того, что занимает мысли. Например: «Мне трудно
-                    сказать нет — помоги подготовить спокойный ответ».
-                  </p>
-                </div>
-              )}
-              {allMessages.map((m, i) => (
+              {[...(history.data || []), ...messages].map((m, i) => (
                 <div className={"chat-message " + m.role} key={i}>
                   <span>{m.role === "user" ? "Вы" : "Помощник"}</span>
                   <p>{m.text}</p>
@@ -88,28 +145,20 @@ export default function Assistant() {
               />
               <button
                 className="primary-button"
-                disabled={busy || !config.data?.ai_enabled}
+                disabled={busy || !text.trim()}
               >
                 {busy ? "Готовим ответ…" : "Отправить"}
               </button>
-              {!config.data?.ai_enabled && (
-                <p>Помощник пока не подключён владельцем сервиса.</p>
-              )}
               {remaining !== null && (
                 <small>Осталось сообщений сегодня: {remaining}</small>
-              )}
-              {error && (
-                <p role="alert" className="error">
-                  {error}
-                </p>
               )}
             </form>
           </>
         )
       )}
+      {error && <p role="alert">{error}</p>}
       <p className="small-note section">
-        Это AI-помощник для саморефлексии, не психолог. Он может ошибаться.
-        Сообщение и контекст отправляются подключённому поставщику AI только при
+        AI может ошибаться. Вопрос и контекст отправляются поставщику только при
         нажатии «Отправить».
       </p>
     </section>

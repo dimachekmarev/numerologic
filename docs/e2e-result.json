@@ -1,5 +1,1 @@
-{
-  "full_flow": "passed",
-  "mobile_routes": 12,
-  "browser_errors": []
-}
+{"date":"2026-10-14","version":"3.0.0","browser_flow":"not_run","reason":"Browser control capability is unavailable in this managed environment. Prior release browser results do not validate this release."}

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useLoad } from "../hooks";
 import Status from "../components/Status";
+import TrialAccess from "../components/TrialAccess";
 import { formatPrice } from "../data/products";
 export function Practice() {
   const { slug } = useParams(),
@@ -26,6 +27,7 @@ export function Practice() {
     setBusyIndex(index);
     try {
       await api.mark({ slug, index, done });
+      setOptimistic({});
       state.reload();
     } catch (e) {
       setOptimistic((values) => {
@@ -47,6 +49,7 @@ export function Practice() {
         <p>{p.subtitle}</p>
       </div>
       {error && <p role="alert">{error}</p>}
+      {!p.unlocked && <TrialAccess onChanged={state.reload} />}
       <div className="practice-list">
         {p.days.map((d, i) => (
           <article className="soft-card practice-day" key={d.index}>
@@ -54,7 +57,7 @@ export function Practice() {
             <h2>{d.title}</h2>
             <p>{d.exercise}</p>
             <p className="reflection-question">В дневник: {d.question}</p>
-            {p.unlocked && (
+            {(p.unlocked || d.index === 0) && (
               <label className="checkbox-label">
                 <input
                   type="checkbox"
@@ -113,6 +116,7 @@ export default function Practices() {
         </p>
       </div>
       <Status {...state} />
+      <TrialAccess onChanged={state.reload} />
       <div className="product-grid">
         {state.data?.map((p) => (
           <article className="soft-card feature-card" key={p.slug}>

@@ -13,13 +13,15 @@ export async function request(path, options = {}) {
   const body = await response.json().catch(() => null);
   if (!response.ok) {
     const detail = body?.detail;
-    throw new Error(
+    const error = new Error(
       typeof detail === "string"
         ? detail
         : Array.isArray(detail)
           ? detail.map((x) => x.msg).join("; ")
           : "Сервис недоступен. Попробуйте ещё раз.",
     );
+    error.status = response.status;
+    throw error;
   }
   return body;
 }
@@ -36,12 +38,33 @@ export async function ensureSession() {
 }
 async function secured(path, options) {
   await ensureSession();
-  return request(path, options);
+  try {
+    return await request(path, options);
+  } catch (error) {
+    if (error.status === 401) sessionPromise = null;
+    throw error;
+  }
 }
 function securePost(path, data) {
   return secured(path, { method: "POST", body: JSON.stringify(data) });
 }
 export const api = {
+  trial: () => securePost("/api/trial", {}),
+  material: (slug, partner) => securePost("/api/materials", { slug, partner }),
+  weekly: () => secured("/api/weekly"),
+  reflection: (focus) => securePost("/api/reflection", { focus }),
+  journals: (page = 1, search = "") =>
+    secured(`/api/journal?page=${page}&search=${encodeURIComponent(search)}`),
+  journalDay: (day) => secured(`/api/journal/${day}`),
+  deleteJournal: (day) => secured(`/api/journal/${day}`, { method: "DELETE" }),
+  recoveryCode: (password) =>
+    securePost("/api/auth/recovery-code", { password }),
+  changePassword: (data) => securePost("/api/auth/change-password", data),
+  resetPassword: (data) =>
+    post("/api/auth/reset-password", data).then((result) => {
+      sessionPromise = Promise.resolve(result);
+      return result;
+    }),
   config: () => request("/api/config"),
   me: () => secured("/api/me"),
   products: () => request("/api/products"),
@@ -62,9 +85,17 @@ export const api = {
   login: (data) =>
     post("/api/auth/login", data).then((result) => {
       sessionPromise = Promise.resolve(result);
+      for (const key of Object.keys(localStorage))
+        if (key.startsWith("numerologic_")) localStorage.removeItem(key);
+      for (const key of Object.keys(sessionStorage))
+        if (key.startsWith("numerologic_")) sessionStorage.removeItem(key);
       return result;
     }),
-  register: (data) => securePost("/api/auth/register", data),
+  register: (data) =>
+    securePost("/api/auth/register", data).then((result) => {
+      sessionPromise = Promise.resolve(result);
+      return result;
+    }),
   logout: async () => {
     await post("/api/auth/logout");
     sessionPromise = null;

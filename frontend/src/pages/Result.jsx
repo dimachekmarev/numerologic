@@ -49,6 +49,14 @@ export default function Result() {
           </div>
         </div>
         <p className="small-note">{stored.profile.arithmetic}</p>
+        <div className="hero-actions">
+          <Link className="primary-button" to="/numbers">
+            Полная карта чисел ↗
+          </Link>
+          <Link className="secondary-button" to="/today">
+            Моя тема дня
+          </Link>
+        </div>
         <p>
           Фокус запроса: <b>{quiz?.focus || mini.focus}</b>
         </p>

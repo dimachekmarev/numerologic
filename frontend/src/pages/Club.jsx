@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { api } from "../api";
+import TrialAccess from "../components/TrialAccess";
 export default function Club() {
   useEffect(() => {
     api.track("club_viewed");
@@ -19,6 +20,7 @@ export default function Club() {
           нужный момент.
         </p>
       </div>
+      <TrialAccess />
       <div className="section-grid">
         <article className="soft-card club-price feature-card">
           <span className="chip">30 дней доступа</span>

@@ -69,7 +69,7 @@ def paid(client, slug="deep-reading"):
 
 
 def test_reduces_each_digit_and_matches_user_master_rule():
-    assert m.calc_profile("Дмитрий", "1984-05-02", date(2026, 10, 5))["life_path"] == 2
+    assert m.calc_profile("Дмитрий", "1984-05-02", date(2026, 10, 5))["life_path"] == 11
     assert m.reduce_number(11) == 2 and m.reduce_number(22) == 4 and m.reduce_number(33) == 6
     assert m.calc_profile("Анна", "1995-05-02", date(2026, 10, 5))["life_path"] == 4
 

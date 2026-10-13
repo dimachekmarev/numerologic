@@ -12,11 +12,12 @@ export default function Header() {
       </Link>
       <nav className="desktop-nav" aria-label="Основная навигация">
         <NavLink to="/today">Сегодня</NavLink>
+        <NavLink to="/numbers">Карта</NavLink>
         <NavLink to="/practices">Практики</NavLink>
         <NavLink to="/journal">Дневник</NavLink>
         <NavLink to="/calendar">Календарь</NavLink>
         <NavLink to="/goals">Цели</NavLink>
-        <NavLink to="/assistant">AI</NavLink>
+        <NavLink to="/assistant">Помощник</NavLink>
       </nav>
       <Link className="ghost-button" to="/dashboard">
         Мой кабинет ↗

@@ -21,6 +21,8 @@ import Goals from "./pages/Goals";
 import Assistant from "./pages/Assistant";
 import Account from "./pages/Account";
 import ResetPassword from "./pages/ResetPassword";
+import Numbers from "./pages/Numbers";
+import Weekly from "./pages/Weekly";
 import "./App.css";
 
 function SimpleLegalPage({ title, children }) {
@@ -42,6 +44,8 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="today" element={<Today />} />
+          <Route path="numbers" element={<Numbers />} />
+          <Route path="weekly" element={<Weekly />} />
           <Route path="journal" element={<Journal />} />
           <Route path="practices" element={<Practices />} />
           <Route path="practices/:slug" element={<Practice />} />

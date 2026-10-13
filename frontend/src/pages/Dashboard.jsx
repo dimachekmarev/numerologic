@@ -3,8 +3,10 @@ import { api } from "../api";
 import { useLoad } from "../hooks";
 import Status from "../components/Status";
 import ReportCard from "../components/ReportCard";
+import TrialAccess from "../components/TrialAccess";
 export default function Dashboard() {
-  const state = useLoad(api.dashboard);
+  const state = useLoad(api.dashboard),
+    week = useLoad(api.weekly);
   if (!state.data)
     return (
       <section className="section">
@@ -13,29 +15,50 @@ export default function Dashboard() {
     );
   const d = state.data,
     p = d.user.profile;
-  const week = d.entries.slice(0, 7);
   return (
     <section className="section">
       <div className="section-heading split">
         <div>
-          <span className="eyebrow">Всё важное — здесь</span>
+          <span className="eyebrow">Ваше личное пространство</span>
           <h1>
             {d.user.name === "Гость"
-              ? "Ваше пространство"
-              : `Здравствуйте, ${d.user.name}.`}
+              ? "Начните с себя."
+              : `${d.user.name}, добро пожаловать.`}
           </h1>
-          <p>
-            Ваши записи, карта и материалы. Продолжайте с того места, где
-            остановились.
-          </p>
+          <p>Карта, мысли и маленькие шаги — всё сохраняется здесь.</p>
         </div>
         <Link className="secondary-button" to="/account">
-          Аккаунт ↗
+          Настройки аккаунта ↗
         </Link>
       </div>
+      {(!p || !d.user.registered) && (
+        <article className="soft-card setup-card">
+          <h3>Два шага, чтобы начать</h3>
+          <div className="hero-actions">
+            <Link
+              className={p ? "secondary-button" : "primary-button"}
+              to="/quiz"
+            >
+              {p ? "✓" : "01"} Заполнить профиль
+            </Link>
+            <Link
+              className={
+                d.user.registered ? "secondary-button" : "primary-button"
+              }
+              to="/account"
+            >
+              {d.user.registered ? "✓" : "02"} Сохранить аккаунт
+            </Link>
+          </div>
+          <p>
+            В гостевом режиме записи привязаны к этому браузеру. Сохраните
+            аккаунт для входа на других устройствах.
+          </p>
+        </article>
+      )}
       <div className="dashboard-grid">
-        <article className="soft-card feature-card">
-          <span className="chip">Карта чисел</span>
+        <Link className="soft-card feature-card map-preview" to="/numbers">
+          <span className="chip">Моя карта чисел</span>
           {p ? (
             <>
               <div className="numbers-row">
@@ -48,46 +71,41 @@ export default function Dashboard() {
                   <span>месяц</span>
                 </div>
               </div>
+              <h3>{p.meaning}</h3>
               <p>{p.arithmetic}</p>
-              <small>{p.system}</small>
             </>
           ) : (
-            <p>Пройдите бесплатный мини-разбор.</p>
+            <p>Имя и дата рождения — начало вашей карты.</p>
           )}
-          <Link className="ghost-button" to="/quiz">
-            Обновить профиль
-          </Link>
-        </article>
-        <article className="soft-card feature-card">
-          <span className="chip">Обзор записей</span>
-          <h2>{week.length} наблюдений</h2>
+          <span className="ghost-button">Открыть карту ↗</span>
+        </Link>
+        <Link className="soft-card feature-card" to="/weekly">
+          <span className="chip">Моя неделя</span>
+          <h2>{week.data?.entries || 0} наблюдений</h2>
           <p>
-            {week.filter((e) => e.done).length} отмеченных шагов в последних
-            семи записях.
+            {week.data?.steps || 0} шагов за последние семь дней.{" "}
+            {week.data?.streak || 0} дней записей подряд.
           </p>
-          <p>Подумайте: что поддерживало вас и что стоит повторить?</p>
-          <Link className="ghost-button" to="/journal">
-            Вернуться к дневнику
-          </Link>
-        </article>
+          <span className="ghost-button">Посмотреть обзор ↗</span>
+        </Link>
         <article className="soft-card feature-card tint-lavender">
-          <span className="chip">
-            {d.club ? "Клуб открыт" : "Numerologic Club"}
-          </span>
-          <h2>{d.club ? "В вашем темпе." : "Поддержка каждый день."}</h2>
+          <span className="chip">Продолжить сегодня</span>
+          <h2>Пять минут для себя.</h2>
           <p>
-            {d.club
-              ? `Доступ до ${new Date(d.expires).toLocaleDateString("ru-RU")}.`
-              : "Все практики и AI-помощник. 1 000 ₽ за 30 дней."}
+            Посмотрите тему дня, выберите упражнение и сохраните одну мысль.
           </p>
-          <Link className="ghost-button" to={d.club ? "/assistant" : "/club"}>
-            {d.club ? "Поговорить с помощником" : "Посмотреть клуб"} ↗
+          <Link className="primary-button" to="/today">
+            Мой день ↗
+          </Link>
+          <Link className="ghost-button" to="/journal">
+            Открыть дневник
           </Link>
         </article>
       </div>
+      <TrialAccess onChanged={state.reload} />
       <div className="section-heading section">
         <h2>Ваши материалы</h2>
-        <p>Разовые покупки остаются в кабинете после окончания клуба.</p>
+        <p>Сформированные материалы и PDF сохраняются в кабинете.</p>
       </div>
       <div className="reports-grid">
         {d.reports.map((r) => (
@@ -95,13 +113,10 @@ export default function Dashboard() {
         ))}
         {!d.reports.length && (
           <article className="soft-card feature-card">
-            <h3>Начните с бесплатной практики</h3>
-            <p>
-              Сначала попробуйте первый день — выберите материал по своему
-              запросу.
-            </p>
-            <Link className="primary-button" to="/practices">
-              Выбрать практику
+            <h3>Выберите первый материал</h3>
+            <p>Практикумы, карта периода и вопросы для диалога.</p>
+            <Link className="primary-button" to="/products">
+              Посмотреть материалы ↗
             </Link>
           </article>
         )}
