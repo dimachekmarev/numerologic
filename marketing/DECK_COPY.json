@@ -1,0 +1,202 @@
+{
+  "version": "1.0",
+  "audience": "B2C customers; not investors",
+  "product_status": {
+    "payments_enabled": false,
+    "live_ai_enabled": false,
+    "trial_days": 7,
+    "trial_once_per_account": true,
+    "club_rub_per_30_days": 1190
+  },
+  "design_variants": [
+    {
+      "id": "a",
+      "name": "Numbers and clarity",
+      "recommended_landing": "/landing-a",
+      "visual_direction": "Indigo, clear typographic numbers, product chart crops, calm white space."
+    },
+    {
+      "id": "b",
+      "name": "Your small steps",
+      "recommended_landing": "/landing-b",
+      "visual_direction": "Warm paper tones, journal cards, calendar and habit interface crops, gentle motion."
+    }
+  ],
+  "slides": [
+    {
+      "id": 1,
+      "ru": {
+        "title": "Ваши числа. Ваши слова. Ваш следующий шаг.",
+        "body": "Numerologic соединяет личную карту, дневник и маленькие практики. Начните с вопроса о себе — продолжайте своим опытом.",
+        "cta": "Открыть Numerologic"
+      },
+      "en": {
+        "title": "Your numbers. Your words. Your next step.",
+        "body": "Numerologic brings your chart, journal, and small practices together. Begin with a question about yourself and continue with your own experience.",
+        "cta": "Open Numerologic"
+      },
+      "visual_key": "brand",
+      "factual_metrics": [],
+      "cta_url": "https://numerologic.dimachek777.chatgpt.site/landing-a"
+    },
+    {
+      "id": 2,
+      "ru": {
+        "title": "Карта, которую можно обсуждать с собой",
+        "body": "Рассчитайте карту по дате рождения. Мастер-числа 11, 22 и 33 сохраняются. Выберите одну тему, сравните её с жизненным примером и сохраните PDF.",
+        "cta": "Рассчитать бесплатную карту"
+      },
+      "en": {
+        "title": "A chart to reflect on",
+        "body": "Calculate a chart from your birth date. Master numbers 11, 22, and 33 are preserved. Pick a theme, compare it with a real example, and save your PDF.",
+        "cta": "Calculate your free chart"
+      },
+      "visual_key": "chart",
+      "factual_metrics": [
+        {
+          "value": "11 / 22 / 33",
+          "ru": "Мастер-числа сохраняются",
+          "en": "Master numbers are preserved"
+        }
+      ],
+      "cta_url": "https://numerologic.dimachek777.chatgpt.site/landing-a"
+    },
+    {
+      "id": 3,
+      "ru": {
+        "title": "Пять минут и один следующий шаг",
+        "body": "Запишите мысль в дневнике, выберите небольшую цель и удобное время в календаре. Отмечайте привычки и возвращайтесь к практикам недели в своём темпе.",
+        "cta": "Сделать первую запись"
+      },
+      "en": {
+        "title": "Five minutes and one next step",
+        "body": "Write a thought in your journal, choose a small goal, and make time in your calendar. Track habits and return to weekly practices at your own pace.",
+        "cta": "Write your first entry"
+      },
+      "visual_key": "daily",
+      "factual_metrics": [
+        {
+          "value": "5 min",
+          "ru": "Предлагаемый формат практики, не обещание результата",
+          "en": "A suggested practice length, not a promised outcome"
+        }
+      ],
+      "cta_url": "https://numerologic.dimachek777.chatgpt.site/landing-b"
+    },
+    {
+      "id": 4,
+      "ru": {
+        "title": "Ваши маленькие шаги заслуживают своей истории",
+        "body": "30-дневный маршрут предлагает последовательные вопросы и действия. Первый день доступен бесплатно. Обзор месяца помогает посмотреть на ваши сохранённые записи и привычки.",
+        "cta": "Попробовать первый день"
+      },
+      "en": {
+        "title": "Your small steps deserve a place in your story",
+        "body": "The 30-day route offers a sequence of questions and actions. Day one is free. Your monthly review helps you look back at saved entries and habits.",
+        "cta": "Try day one"
+      },
+      "visual_key": "retention",
+      "factual_metrics": [
+        {
+          "value": "30",
+          "ru": "Дней в маршруте; полный маршрут в trial/оплаченном доступе",
+          "en": "Days in the route; full route in trial/paid access"
+        }
+      ],
+      "cta_url": "https://numerologic.dimachek777.chatgpt.site/landing-b"
+    },
+    {
+      "id": 5,
+      "ru": {
+        "title": "Начните бесплатно. Попробуйте глубже.",
+        "body": "Бесплатная основа остаётся доступной. После регистрации — один полный пробный период на 7 дней без банковской карты и платежа. Основные привычки и обзор месяца доступны бесплатно.",
+        "cta": "Зарегистрироваться и начать trial"
+      },
+      "en": {
+        "title": "Start free. Explore further.",
+        "body": "The free core stays available. Registration includes one full seven-day trial, with no card or payment. Core habits and the monthly review are free.",
+        "cta": "Register and start your trial"
+      },
+      "visual_key": "trial",
+      "factual_metrics": [
+        {
+          "value": "7",
+          "ru": "Дней одного полного trial после регистрации",
+          "en": "Days in one full trial after registration"
+        },
+        {
+          "value": "0",
+          "ru": "Карт и платежей для начала trial",
+          "en": "Cards or payments required to start the trial"
+        }
+      ],
+      "cta_url": "https://numerologic.dimachek777.chatgpt.site/landing-b"
+    },
+    {
+      "id": 6,
+      "ru": {
+        "title": "Выбирайте материал под свой вопрос",
+        "body": "Доступны страницы тематических отчётов и практик: личная карта, отношения, период жизни и другие вопросы. Планируемые цены: короткие практики 440–890 ₽, отчёты 1 090–3 390 ₽. Оплата пока выключена.",
+        "cta": "Посмотреть материалы и условия"
+      },
+      "en": {
+        "title": "Choose material for your question",
+        "body": "Explore pages for focused reports and practices: a personal chart, relationships, life period, and other questions. Planned prices: short practices RUB 440–890, reports RUB 1,090–3,390. Payments are currently disabled.",
+        "cta": "Explore materials and terms"
+      },
+      "visual_key": "catalog",
+      "factual_metrics": [
+        {
+          "value": "440–890 ₽",
+          "ru": "Планируемые цены коротких практик",
+          "en": "Planned short practice prices"
+        },
+        {
+          "value": "1 090–3 390 ₽",
+          "ru": "Планируемые цены отчётов",
+          "en": "Planned report prices"
+        }
+      ],
+      "cta_url": "https://numerologic.dimachek777.chatgpt.site/landing-a"
+    },
+    {
+      "id": 7,
+      "ru": {
+        "title": "Вы выбираете темп и формат",
+        "body": "Клуб предполагает 30 дней доступа за 1 190 ₽ после подключения оплаты. Полный маршрут — в trial или соответствующем доступе. Живой AI пока не подключён: нынешний опыт строится на карте, записях и практиках.",
+        "cta": "Посмотреть, что остаётся бесплатно"
+      },
+      "en": {
+        "title": "You choose your pace and format",
+        "body": "The club is planned at RUB 1,190 for 30 days once payments are connected. The full route is available in the trial or relevant access. Live AI is not connected; the current experience uses your chart, entries, and practices.",
+        "cta": "See what stays free"
+      },
+      "visual_key": "access",
+      "factual_metrics": [
+        {
+          "value": "1 190 ₽ / 30",
+          "ru": "Планируемая цена клуба за 30 дней; оплата выключена",
+          "en": "Planned club price for 30 days; payments disabled"
+        }
+      ],
+      "cta_url": "https://numerologic.dimachek777.chatgpt.site/landing-b"
+    },
+    {
+      "id": 8,
+      "ru": {
+        "title": "Начните с одного вопроса сегодня",
+        "body": "Откройте карту или выберите пятиминутную практику. Сохраните одну запись и один следующий шаг. Numerologic — инструмент саморефлексии: ваши решения остаются вашими.",
+        "cta": "Начать бесплатно"
+      },
+      "en": {
+        "title": "Start with one question today",
+        "body": "Open your chart or choose a five-minute practice. Save one note and one next step. Numerologic is a reflection tool: your decisions remain yours.",
+        "cta": "Start free"
+      },
+      "visual_key": "start",
+      "factual_metrics": [],
+      "cta_url": "https://numerologic.dimachek777.chatgpt.site/landing-b"
+    }
+  ],
+  "metrics_note": "All displayed numbers describe product terms or suggested practice format. No customer, revenue, conversion, growth, or outcome statistics are claimed."
+}

@@ -1,3 +1,4 @@
+import campaigns from "../frontend/src/data/campaigns.json" with { type: "json" };
 import catalog from "../backend/catalog.json" with { type: "json" };
 import { database } from "./db.mjs";
 import {
@@ -14,7 +15,8 @@ import {
   library,
 } from "./engine.mjs";
 import { pdf } from "./pdf.mjs";
-import { mapContent } from "./engine.mjs";
+import { habitStats, monthlyStats, calendarReminder } from "./retention.mjs";
+import { mapContent, localizeContent } from "./engine.mjs";
 import { weekSummary, guidedReflection } from "./reflection.mjs";
 
 const enc = new TextEncoder(),
@@ -99,6 +101,15 @@ async function api(request, env, responseHeaders) {
     path = url.pathname,
     method = request.method,
     db = database(env.DB);
+  const language = (
+    url.searchParams.get("lang") ||
+    request.headers.get("Accept-Language") ||
+    "ru"
+  )
+    .toLowerCase()
+    .startsWith("en")
+    ? "en"
+    : "ru";
   const now = Date.now();
   let body = {};
   if (!["GET", "HEAD"].includes(method)) {
@@ -124,6 +135,7 @@ async function api(request, env, responseHeaders) {
       fail(422, "Некорректные данные запроса");
     }
   }
+  if (path === "/api/marketing/campaigns" && method === "GET") return campaigns;
   const sessionToken = (request.headers.get("Cookie") || "").match(
     /(?:^|;\s*)numerologic_session=([^;]+)/,
   )?.[1];
@@ -135,11 +147,37 @@ async function api(request, env, responseHeaders) {
         now,
       )
     : null;
+  // Sites supplies authenticated identity server-side. This also works when an embedded browser blocks cookies.
+  const platformSubject =
+    request.headers.get("oai-authenticated-user-id") ||
+    request.headers.get("oai-authenticated-user-email")?.toLowerCase();
+  const platformKey = platformSubject
+    ? await digest("sites:" + platformSubject)
+    : null;
+  const platformAccount = async () =>
+    platformKey
+      ? await db.one(
+          "SELECT a.* FROM cloud_accounts a JOIN cloud_records r ON r.owner=a.id WHERE r.kind='platform_identity' AND r.key=?",
+          platformKey,
+        )
+      : null;
+  if (!user && platformKey) user = await platformAccount();
+  const bindPlatform = async (u) => {
+    if (!platformKey) return;
+    await db.run(
+      "INSERT INTO cloud_records(owner,kind,key,data) VALUES(?,?,?,?) ON CONFLICT(kind,key) WHERE kind='platform_identity' DO UPDATE SET owner=excluded.owner",
+      u.id,
+      "platform_identity",
+      platformKey,
+      "{}",
+    );
+  };
   const requireUser = () => {
     if (!user) fail(401, "Сначала войдите в кабинет");
     return user;
   };
   const issue = async (u) => {
+    await bindPlatform(u);
     const token = random();
     await db.run(
       "INSERT INTO cloud_sessions(key,owner,expires) VALUES(?,?,?)",
@@ -149,7 +187,7 @@ async function api(request, env, responseHeaders) {
     );
     responseHeaders.set(
       "Set-Cookie",
-      `numerologic_session=${token}; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax${url.protocol === "https:" ? "; Secure" : ""}`,
+      `numerologic_session=${token}; Path=/; Max-Age=2592000; HttpOnly; ${url.protocol === "https:" ? "SameSite=None; Secure; Partitioned" : "SameSite=Lax"}`,
     );
   };
   const owned = async (kind, id) => {
@@ -318,7 +356,7 @@ async function api(request, env, responseHeaders) {
     await db.one("SELECT 1");
     return {
       status: "ok",
-      version: "3.0.0",
+      version: "3.1.0",
       payment_provider: preview(env) ? "mock" : "disabled",
       storage: "durable",
     };
@@ -355,6 +393,19 @@ async function api(request, env, responseHeaders) {
         "Гость",
         "Ясность",
       );
+      if (platformKey) {
+        const created = user;
+        await db.run(
+          "INSERT INTO cloud_records(owner,kind,key,data) VALUES(?,?,?,?) ON CONFLICT DO NOTHING",
+          created.id,
+          "platform_identity",
+          platformKey,
+          "{}",
+        );
+        user = await platformAccount();
+        if (user.id !== created.id)
+          await db.run("DELETE FROM cloud_accounts WHERE id=?", created.id);
+      }
       await issue(user);
     }
     return publicUser(user);
@@ -408,8 +459,14 @@ async function api(request, env, responseHeaders) {
       await db.run("DELETE FROM cloud_sessions WHERE key=?", sessionKey);
     responseHeaders.set(
       "Set-Cookie",
-      "numerologic_session=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax",
+      `numerologic_session=; Path=/; Max-Age=0; HttpOnly; ${url.protocol === "https:" ? "SameSite=None; Secure; Partitioned" : "SameSite=Lax"}`,
     );
+    if (platformKey)
+      await db.run(
+        "DELETE FROM cloud_records WHERE kind=? AND key=?",
+        "platform_identity",
+        platformKey,
+      );
     return { ok: true };
   }
   if (path === "/api/auth/telegram")
@@ -542,13 +599,17 @@ async function api(request, env, responseHeaders) {
             customer,
             partner,
             year: today().slice(0, 4),
-            version: 3,
+            version: 4,
+            language,
           }),
         ));
     const report = {
-      title: p.title + " · " + user.name,
+      title: localizeContent(p.title, language) + " · " + user.name,
       report_type: slug,
-      content: reportContent(customer, slug, partner),
+      content: reportContent(customer, slug, partner, language),
+      customer,
+      partner,
+      language,
       generated_at: new Date().toISOString(),
     };
     await db.run(
@@ -560,9 +621,108 @@ async function api(request, env, responseHeaders) {
     );
     return decode(await db.get(user.id, "report", key));
   }
+  if (path === "/api/rituals" && method === "GET") {
+    const marks = (await db.list(user.id, "habit_mark")).map(decode),
+      habits = (await db.list(user.id, "habit")).map(decode);
+    return {
+      day: today(),
+      habits: habits.map((h) => habitStats(h, marks, today())),
+    };
+  }
+  if (path === "/api/habits" && method === "POST") {
+    const title = text(body.title, 1, 120),
+      days = body.days;
+    if (
+      !Array.isArray(days) ||
+      !days.length ||
+      days.some((d) => !Number.isInteger(d) || d < 0 || d > 6)
+    )
+      fail(422, "Выберите дни недели");
+    if (body.id) {
+      const row = await owned("habit", Number(body.id)),
+        h = decode(row);
+      return decode(
+        await db.put(user.id, "habit", row.key, {
+          title,
+          days: [...new Set(days)],
+          created: h.created,
+        }),
+      );
+    }
+    if ((await db.list(user.id, "habit")).length >= 12)
+      fail(422, "Оставьте не больше 12 личных ритуалов");
+    return decode(
+      await db.put(user.id, "habit", random(), {
+        title,
+        days: [...new Set(days)],
+        created: today(),
+      }),
+    );
+  }
+  if (path === "/api/habits/check" && method === "POST") {
+    const habit = decode(await owned("habit", Number(body.id))),
+      day = date(body.day),
+      key = habit.id + ":" + day;
+    if (day > today() || day < habit.created || typeof body.done !== "boolean")
+      fail(422, "Некорректный день ритуала");
+    if (!habit.days.includes(new Date(day + "T12:00:00Z").getUTCDay()))
+      fail(422, "На этот день ритуал не запланирован");
+    if (body.done)
+      await db.put(user.id, "habit_mark", key, { habit_id: habit.id, day });
+    else
+      await db.run(
+        "DELETE FROM cloud_records WHERE owner=? AND kind=? AND key=?",
+        user.id,
+        "habit_mark",
+        key,
+      );
+    return { ok: true };
+  }
+  if (/^\/api\/habits\/\d+$/.test(path) && method === "DELETE") {
+    const h = await owned("habit", Number(path.split("/").pop()));
+    await db.batch([
+      [
+        "DELETE FROM cloud_records WHERE owner=? AND kind=? AND json_extract(data,'$.habit_id')=?",
+        user.id,
+        "habit_mark",
+        h.id,
+      ],
+      ["DELETE FROM cloud_records WHERE owner=? AND id=?", user.id, h.id],
+    ]);
+    return { ok: true };
+  }
+  if (path === "/api/monthly" && method === "GET") {
+    const month = url.searchParams.get("month") || today().slice(0, 7);
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) fail(422, "Некорректный месяц");
+    return monthlyStats(
+      (await db.list(user.id, "journal")).map(decode),
+      await goals(),
+      (await db.list(user.id, "habit_mark")).map(decode),
+      month,
+    );
+  }
+  if (path === "/api/reminder.ics" && method === "GET") {
+    const hour = Number(url.searchParams.get("hour") || 20),
+      minute = Number(url.searchParams.get("minute") || 0);
+    if (
+      !Number.isInteger(hour) ||
+      hour < 0 ||
+      hour > 23 ||
+      !Number.isInteger(minute) ||
+      minute < 0 ||
+      minute > 59
+    )
+      fail(422, "Некорректное время");
+    return new Response(calendarReminder(hour, minute), {
+      headers: {
+        "Content-Type": "text/calendar;charset=utf-8",
+        "Content-Disposition": 'attachment; filename="numerologic-ritual.ics"',
+      },
+    });
+  }
   if (path === "/api/profile/pdf" && method === "GET") {
     if (!user.birth_date) fail(422, "Заполните профиль");
-    return new Response(await pdf(mapContent(user)), {
+    return new Response(await pdf(mapContent(user, language)), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": 'attachment; filename="numerologic-map.pdf"',
@@ -813,9 +973,12 @@ async function api(request, env, responseHeaders) {
     const p = product(o.product),
       c = o.customer.customer,
       report = {
-        title: p.title + " · " + c.name,
+        title: localizeContent(p.title, language) + " · " + c.name,
         report_type: o.product,
-        content: reportContent(c, o.product, o.customer.partner),
+        content: reportContent(c, o.product, o.customer.partner, language),
+        customer: c,
+        partner: o.customer.partner,
+        language,
         generated_at: new Date().toISOString(),
       };
     const jobs = [
@@ -858,6 +1021,16 @@ async function api(request, env, responseHeaders) {
   if (/^\/api\/reports\/\d+(\/pdf|\/discuss)?$/.test(path)) {
     const id = Number(path.split("/")[3]),
       r = decode(await owned("report", id));
+    if (r.customer && r.report_type && language !== (r.language || "ru")) {
+      r.content = reportContent(r.customer, r.report_type, r.partner, language);
+      r.title =
+        (language === "en"
+          ? "Your material"
+          : product(r.report_type)?.title || "Материал") +
+        " · " +
+        r.customer.name;
+      r.language = language;
+    }
     if (path.endsWith("/pdf") && method === "GET")
       return new Response(await pdf(r.content), {
         headers: {
@@ -903,6 +1076,8 @@ async function api(request, env, responseHeaders) {
       entries: (await db.list(user.id, "journal")).map(decode),
       goals: await goals(),
       practice_progress: (await db.list(user.id, "progress")).map(decode),
+      habits: (await db.list(user.id, "habit")).map(decode),
+      habit_marks: (await db.list(user.id, "habit_mark")).map(decode),
       chat: (await db.list(user.id, "chat")).map(decode),
       ai_reflections: (await db.list(user.id, "insight")).map(decode),
       orders: (await db.list(user.id, "order")).map(decode).map((o) => ({
@@ -922,11 +1097,14 @@ async function api(request, env, responseHeaders) {
     ]);
     responseHeaders.set(
       "Set-Cookie",
-      "numerologic_session=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax",
+      `numerologic_session=; Path=/; Max-Age=0; HttpOnly; ${url.protocol === "https:" ? "SameSite=None; Secure; Partitioned" : "SameSite=Lax"}`,
     );
     return { ok: true };
   }
-  if (path === "/api/events" && method === "POST") {
+  if (
+    (path === "/api/events" || path === "/api/marketing/events") &&
+    method === "POST"
+  ) {
     const allowed = [
       "quiz_started",
       "quiz_completed",
@@ -937,10 +1115,29 @@ async function api(request, env, responseHeaders) {
       "share_daily",
       "assistant_used",
       "account_registered",
+      "landing_view",
+      "trial_started",
+      "diary_saved",
+      "practice_completed",
+      "habit_checked",
+      "monthly_review_created",
+      "return_visit",
+      "offer_viewed",
     ];
     if (!allowed.includes(body.event)) fail(422, "Некорректное событие");
     const properties = {};
-    for (const k of ["product", "source", "campaign"])
+    for (const k of [
+      "product",
+      "source",
+      "campaign",
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_content",
+      "locale",
+      "variant",
+      "ref",
+    ])
       if (body.properties?.[k] != null)
         properties[k] = String(body.properties[k]).slice(0, 100);
     await db.put(user.id, "event", random(), {
@@ -949,6 +1146,16 @@ async function api(request, env, responseHeaders) {
       created: new Date().toISOString(),
     });
     return { ok: true };
+  }
+  if (path === "/api/marketing/metrics" && method === "GET") {
+    const events = (await db.list(user.id, "event")).map(decode);
+    return {
+      scope: "current_account",
+      events: events.reduce((counts, e) => {
+        counts[e.event] = (counts[e.event] || 0) + 1;
+        return counts;
+      }, {}),
+    };
   }
   if (path === "/api/admin/metrics" && method === "GET") {
     if (

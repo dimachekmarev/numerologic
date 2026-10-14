@@ -1,0 +1,662 @@
+/* Numerologic product materials. Import after App.css. Landing directions are independent. */
+.app-shell {
+  --plum: #34323e;
+  --berry: #625675;
+  --muted: #72717a;
+  --line: #e1dfe7;
+  --lavender: #ece8f3;
+  --sage: #edf0e8;
+  --radius: 22px;
+  min-height: 100vh;
+  color: var(--plum);
+  background:
+    radial-gradient(ellipse at 95% 2%, #ddd7ed65, transparent 33%),
+    radial-gradient(ellipse at 0% 32%, #e5eadd55, transparent 30%), #f8f7f4;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.numerologic-brand-mark {
+  display: block;
+  flex: 0 0 auto;
+  max-width: none;
+  object-fit: contain;
+}
+.app-shell .site-header {
+  min-height: 104px;
+  border-bottom-color: #dcd9e2;
+}
+.app-shell .brand {
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  font-size: 1.35rem;
+  gap: 10px;
+}
+.app-shell .brand-caption {
+  font-size: 0.54rem;
+  letter-spacing: 0.17em;
+  margin-top: 5px;
+}
+.app-shell .desktop-nav {
+  gap: clamp(11px, 1.2vw, 20px);
+  font-size: 0.78rem;
+}
+.app-shell .desktop-nav a {
+  transition: color 0.2s;
+}
+.app-shell .desktop-nav a:hover {
+  color: var(--plum);
+}
+.app-shell .desktop-nav a.active {
+  color: var(--plum);
+  box-shadow: inset 0 -1px #7e7392;
+}
+.app-shell h1 {
+  font-family: inherit;
+  font-size: clamp(2.5rem, 5.5vw, 4.7rem);
+  font-weight: 450;
+  letter-spacing: -0.065em;
+  line-height: 1.07;
+}
+.app-shell h2 {
+  font-family: inherit;
+  font-weight: 450;
+  letter-spacing: -0.05em;
+  line-height: 1.15;
+}
+.app-shell h1 em,
+.app-shell h2 em {
+  font-family: Georgia, serif;
+  color: #81728e;
+}
+.app-shell h3 {
+  font-family: inherit;
+  font-weight: 550;
+  letter-spacing: -0.03em;
+}
+.app-shell .section-heading {
+  margin-bottom: 34px;
+}
+.app-shell .section-heading p {
+  max-width: 620px;
+  font-size: 0.92rem;
+}
+.app-shell .eyebrow {
+  font-size: 0.6rem;
+  color: #7e728e;
+  letter-spacing: 0.15em;
+  margin-bottom: 15px;
+}
+.app-shell .hero {
+  padding-block: 85px 70px;
+}
+.app-shell .hero-copy {
+  gap: 23px;
+}
+.app-shell .hero-copy > p {
+  font-size: 0.96rem;
+}
+.app-shell .primary-button {
+  background: #4f465d;
+  border: 1px solid #4f465d;
+  box-shadow: 0 4px 9px #40354e0a;
+}
+.app-shell .primary-button:hover {
+  background: #625675;
+  border-color: #625675;
+}
+.app-shell .secondary-button {
+  border-color: #d0cbd8;
+  background: #fffdf880;
+  color: #5a506b;
+}
+.app-shell .secondary-button:hover {
+  background: #efebf3;
+}
+.app-shell .ghost-button {
+  background: #ebe7f0;
+  color: #625675;
+}
+.app-shell .ghost-button:hover {
+  background: #ded7e8;
+}
+.app-shell :is(.primary-button, .secondary-button, .ghost-button) {
+  border-radius: 12px;
+  font-size: 0.82rem;
+  padding: 13px 20px;
+  gap: 15px;
+}
+.app-shell :is(a, button, summary, input, textarea, select):focus-visible {
+  outline: 3px solid #927ca9;
+  outline-offset: 4px;
+}
+.app-shell button:disabled {
+  transform: none;
+}
+.app-shell .language-switch {
+  background: #fffdfb70;
+  border-color: #d9d4df;
+  padding: 3px;
+}
+.app-shell .language-switch button {
+  font-size: 10px;
+  padding: 8px 9px;
+  font-weight: 500;
+}
+.app-shell .language-switch button[aria-pressed="true"] {
+  background: #e5deed;
+  color: #4f465d;
+}
+.app-shell :is(.soft-card, .glass-card, .product-card, .report-card) {
+  background: linear-gradient(145deg, #fffefc, #fbfaf8);
+  border: 1px solid #e3e0e7;
+  border-radius: var(--radius);
+  box-shadow:
+    0 2px 3px #25203002,
+    0 12px 32px #25203003;
+}
+.app-shell :is(a.soft-card, .product-card, .report-card) {
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.app-shell a.soft-card:hover {
+  border-color: #bfb4cd;
+  box-shadow: 0 7px 30px #50425b0b;
+}
+.app-shell :is(.product-card, .report-card):hover {
+  border-color: #c9c1d3;
+  box-shadow: 0 10px 28px #50425b0a;
+}
+.app-shell .feature-card {
+  gap: 21px;
+}
+.app-shell .feature-card h2 {
+  font-size: clamp(1.7rem, 2.5vw, 2.4rem);
+}
+.app-shell .feature-card > p {
+  font-size: 0.84rem;
+}
+.app-shell .chip {
+  color: #6e5f83;
+  background: #eeebf3;
+  padding: 7px 11px;
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+}
+.app-shell .chip.sage {
+  color: #617453;
+  background: #eaf0e5;
+}
+.app-shell .tint-lavender {
+  background: linear-gradient(130deg, #f5f1fa, #eae5f2);
+}
+.app-shell .tint-sage {
+  background: linear-gradient(130deg, #f7f8f0, #eaf0e3);
+}
+.app-shell .tint-rose {
+  background: linear-gradient(130deg, #fcf6f3, #f2e8e5);
+}
+.app-shell .tint-peach {
+  background: linear-gradient(130deg, #fbf8f1, #f2ebe2);
+}
+.app-shell .product-card {
+  position: relative;
+}
+.app-shell .product-card h3 {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.app-shell .product-card p {
+  font-size: 0.83rem;
+}
+.app-shell .card-topline > strong {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: #625675;
+}
+.app-shell .feature-list {
+  font-size: 0.82rem;
+  padding-left: 17px;
+  line-height: 1.9;
+}
+.app-shell .feature-list li::marker {
+  color: #a79cb5;
+}
+.app-shell .club-banner {
+  border: 1px solid #ded5e9;
+  background:
+    radial-gradient(ellipse at 100% 15%, #e0d8ed, transparent 60%),
+    linear-gradient(120deg, #f1edf6, #e8e3ef);
+}
+.app-shell .map-preview {
+  background:
+    radial-gradient(ellipse at 100% 0, #ddd6eb70, transparent 65%), #fffdf9;
+}
+.app-shell .numbers-row {
+  gap: 14px;
+}
+.app-shell .numbers-row > div {
+  background: #f3f0f6;
+  border: 1px solid #e8e2ef;
+  border-radius: 15px;
+  padding: 16px 20px;
+}
+.app-shell .numbers-row strong {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  color: #6d5c80;
+  letter-spacing: -0.06em;
+}
+.app-shell .numbers-row span {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+.app-shell .daily-main {
+  background:
+    radial-gradient(ellipse at 95% 0, #7b6d9860, transparent 60%),
+    linear-gradient(155deg, #3d354c, #292735);
+  border-color: #3d354c;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow: 0 16px 40px #34304113;
+  padding: 37px;
+}
+.app-shell .daily-main::before,
+.app-shell .daily-main::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border: 1px solid #c4b9da20;
+  border-radius: 50%;
+  right: -70px;
+  top: 65px;
+  pointer-events: none;
+  z-index: -1;
+}
+.app-shell .daily-main::after {
+  top: 95px;
+  width: 240px;
+  height: 240px;
+  right: -40px;
+}
+.app-shell .daily-main :is(h2, h3) {
+  color: #fcfaf7;
+}
+.app-shell .daily-main p {
+  color: #d2cbdc;
+  max-width: 395px;
+}
+.app-shell .daily-main .chip {
+  background: #ffffff12;
+  color: #d6cbeb;
+  border: 1px solid #ffffff16;
+}
+.app-shell .daily-main .primary-button {
+  background: #ddd2ef;
+  border-color: #ddd2ef;
+  color: #352c41;
+  box-shadow: none;
+  margin-top: 10px;
+}
+.app-shell .daily-main .primary-button:hover {
+  background: #f0e7fa;
+}
+.app-shell .daily-number {
+  font-family: Georgia, serif;
+  font-size: clamp(6rem, 10vw, 9rem);
+  letter-spacing: -0.09em;
+  color: #e2d8f0;
+  font-weight: 400;
+  margin-top: 8px;
+}
+.app-shell .tarot-card {
+  background: linear-gradient(125deg, #fbf7f1, #f4eee5);
+  border-color: #e9e1d7;
+}
+.app-shell .astro-card {
+  background: linear-gradient(125deg, #f6f7ee, #eaf0e4);
+  border-color: #dde4d5;
+}
+.app-shell .tarot-symbol {
+  font-size: 6rem;
+  color: #a68c6d25;
+}
+.app-shell .map-hero {
+  background:
+    radial-gradient(ellipse at 100% 0, #ddd7edb0, transparent 62%), #faf8fd;
+  border-color: #dfd9e8;
+}
+.app-shell .number-tile {
+  transition:
+    border-color 0.25s,
+    background 0.25s;
+}
+.app-shell .number-tile:hover {
+  border-color: #c6b7d4;
+  background: #faf7fd;
+}
+.app-shell .number-tile strong {
+  font-size: 4.2rem;
+  font-weight: 400;
+  color: #81718f;
+  letter-spacing: -0.06em;
+}
+.app-shell .number-tile small {
+  color: #76717e;
+  font-size: 0.75rem;
+}
+.app-shell :is(input:not([type="checkbox"]), textarea, select) {
+  background: #fffefb;
+  border: 1px solid #ded9e4;
+  border-radius: 11px;
+  color: #3d3648;
+}
+.app-shell :is(input, textarea, select):focus {
+  border-color: #9884b1;
+  box-shadow: 0 0 0 3px #a78dbc18;
+}
+.app-shell input[type="checkbox"] {
+  accent-color: #726083;
+}
+.app-shell label {
+  color: #71677e;
+  font-size: 0.8rem;
+}
+.app-shell .progress-bar {
+  background: #e9e4ef;
+  height: 5px;
+}
+.app-shell .progress-bar i {
+  background: linear-gradient(90deg, #87749c, #b5a2c7);
+}
+.app-shell .mood-row button {
+  background: #faf8fc;
+  border-color: #e2dbe9;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.app-shell .mood-row button:hover {
+  background: #f1eaf8;
+}
+.app-shell .mood-row button.selected {
+  background: #ece3f4;
+  border-color: #a68abd;
+}
+.app-shell .entry-list .soft-card {
+  background: #fffdf9;
+  border-left: 3px solid #c3b2d1;
+}
+.app-shell .entry-text {
+  color: #5a5366;
+}
+.app-shell .reflection-question {
+  background: linear-gradient(120deg, #f1eaf7, #f5f1fa);
+  border: 1px solid #e4d8ed;
+  border-radius: 12px;
+}
+.app-shell .calendar-day {
+  border-radius: 13px;
+  background: #fffdf9;
+  border-color: #e5e0e8;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.app-shell .calendar-day:hover {
+  background: #f7f3fb;
+}
+.app-shell .calendar-day.today {
+  background: #eee6f5;
+  border-color: #b69acb;
+  box-shadow: inset 0 0 0 1px #b69acb30;
+}
+.app-shell .calendar-day strong {
+  color: #5d4f6b;
+}
+.app-shell .calendar-day small {
+  color: #7a7284;
+}
+.app-shell .calendar-day span {
+  color: #786287;
+}
+.app-shell .goal-row {
+  border-radius: 15px;
+}
+.app-shell .goal-row.done {
+  background: #f2f5ed;
+  border-color: #d8e0cd;
+}
+.app-shell .notice {
+  background: #eee9f4;
+  border: 1px solid #e1d8e9;
+  border-radius: 13px;
+}
+.app-shell .club-price {
+  background: linear-gradient(125deg, #f4eef8, #e7dfee);
+  border-color: #d8cce4;
+}
+.app-shell .price,
+.app-shell .price-line {
+  color: #655174;
+}
+.app-shell .bottom-nav {
+  background: #fffdf7ee;
+  border: 1px solid #ded7e8;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px #352c4815;
+  padding: 6px;
+  backdrop-filter: blur(22px);
+}
+.app-shell .bottom-nav a {
+  color: #81768f;
+  border-radius: 14px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+.app-shell .bottom-nav a.active {
+  color: #625174;
+  background: #ebe3f3;
+}
+.app-shell .bottom-nav a:hover {
+  background: #f0eaf5;
+  color: #625174;
+}
+.app-shell .site-footer {
+  border-top-color: #dcd7e3;
+  font-size: 0.75rem;
+}
+.app-shell .site-footer small {
+  font-size: 0.68rem;
+}
+.app-shell .hero-art::before {
+  background: radial-gradient(ellipse, #ddd6eda0, #eef0e860, transparent);
+}
+.app-shell .celestial-core {
+  background: radial-gradient(circle at 32% 25%, #fdfbf7, #e5deed 60%, #c8bdd9);
+  color: #756183;
+  box-shadow:
+    inset -12px -10px 30px #ac9bb840,
+    0 30px 70px #9780ac20;
+}
+.app-shell .floating-note {
+  border-color: #e0d8e9;
+  background: #fffcf8e8;
+  box-shadow: 0 18px 45px #4d405915;
+  border-radius: 17px;
+}
+.app-shell .orbit {
+  border-color: #aea0c34a;
+}
+.app-shell .orbit::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  background: #b7a4c7;
+  border-radius: 50%;
+}
+
+@media (min-width: 1100px) {
+  .app-shell .daily-main {
+    min-height: 505px;
+  }
+  .app-shell .daily-main > .primary-button {
+    align-self: end;
+    margin-top: 17px;
+  }
+}
+@media (max-width: 1100px) {
+  .app-shell .site-header {
+    gap: 12px;
+  }
+  .app-shell .desktop-nav {
+    font-size: 0.7rem;
+    gap: 11px;
+  }
+  .app-shell .brand {
+    font-size: 1.15rem;
+  }
+  .app-shell .site-header > .ghost-button {
+    font-size: 0.74rem;
+    padding-inline: 14px;
+  }
+}
+@media (max-width: 950px) and (min-width: 761px) {
+  .app-shell .desktop-nav {
+    display: none;
+  }
+  .app-shell .site-header > .language-switch {
+    margin-left: auto;
+  }
+}
+@media (max-width: 760px) {
+  .app-shell {
+    --radius: 19px;
+    padding-bottom: 100px;
+  }
+  .app-shell .site-header {
+    min-height: 84px;
+  }
+  .app-shell .brand {
+    font-size: 1.05rem;
+    gap: 7px;
+  }
+  .app-shell .numerologic-brand-mark {
+    width: 33px;
+    height: 33px;
+  }
+  .app-shell .brand-caption {
+    display: none;
+  }
+  .app-shell .site-header > .ghost-button {
+    min-height: 40px;
+    padding: 10px 12px;
+    font-size: 0.69rem;
+    border-radius: 10px;
+  }
+  .app-shell .hero {
+    padding-block: 44px 35px;
+  }
+  .app-shell .hero h1 {
+    font-size: clamp(2.55rem, 9vw, 3.6rem);
+  }
+  .app-shell .section-heading {
+    margin-bottom: 27px;
+  }
+  .app-shell .section-heading p {
+    font-size: 0.84rem;
+  }
+  .app-shell :is(.soft-card, .product-card, .report-card) {
+    padding: 25px;
+  }
+  .app-shell .daily-main {
+    padding: 30px;
+  }
+  .app-shell .daily-main::before {
+    width: 235px;
+    height: 235px;
+    right: -48px;
+    top: 32px;
+  }
+  .app-shell .daily-main::after {
+    width: 185px;
+    height: 185px;
+    right: -23px;
+    top: 57px;
+  }
+  .app-shell .daily-number {
+    font-size: 7rem;
+  }
+  .app-shell .feature-card h2 {
+    font-size: 1.8rem;
+  }
+  .app-shell .product-card h3 {
+    font-size: 1.3rem;
+  }
+  .app-shell .numbers-grid {
+    gap: 12px;
+  }
+  .app-shell .number-tile strong {
+    font-size: 3.5rem;
+  }
+  .app-shell .calendar-day {
+    border-radius: 10px;
+  }
+  .app-shell .bottom-nav {
+    bottom: max(10px, env(safe-area-inset-bottom));
+  }
+}
+@media (max-width: 420px) {
+  .app-shell .site-header {
+    gap: 7px;
+    flex-wrap: wrap;
+    padding-block: 16px;
+  }
+  .app-shell .site-header .brand {
+    font-size: 1rem;
+  }
+  .app-shell .site-header > .language-switch {
+    margin-left: auto;
+  }
+  .app-shell .site-header > .ghost-button {
+    padding: 9px 10px;
+    font-size: 0.64rem;
+  }
+  .app-shell .language-switch button {
+    padding: 7px 6px;
+    font-size: 9px;
+  }
+  .app-shell .numerologic-brand-mark {
+    width: 28px;
+    height: 28px;
+  }
+  .app-shell :is(.primary-button, .secondary-button, .ghost-button) {
+    font-size: 0.76rem;
+    padding-inline: 16px;
+  }
+  .app-shell .daily-main {
+    padding: 25px;
+  }
+  .app-shell .number-tile strong {
+    font-size: 3rem;
+  }
+  .app-shell .bottom-nav a {
+    font-size: 0.57rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *,
+  .app-shell *::before,
+  .app-shell *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .app-shell .primary-button:hover {
+    transform: none;
+  }
+}

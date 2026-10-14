@@ -1,3 +1,4 @@
+import { useI18n } from "../i18n";
 import { Link } from "react-router-dom";
 const faqs = [
   [
@@ -38,22 +39,35 @@ const faqs = [
   ],
 ];
 export default function Faq() {
+  const { t: tr } = useI18n();
   return (
     <section className="section narrow-page">
       <div className="section-heading">
-        <span className="eyebrow">Понятно и открыто</span>
-        <h1>Ваши вопросы.</h1>
+        <span className="eyebrow">
+          {tr(
+            "\u041F\u043E\u043D\u044F\u0442\u043D\u043E \u0438 \u043E\u0442\u043A\u0440\u044B\u0442\u043E",
+          )}
+        </span>
+        <h1>
+          {tr(
+            "\u0412\u0430\u0448\u0438 \u0432\u043E\u043F\u0440\u043E\u0441\u044B.",
+          )}
+        </h1>
       </div>
       <div className="entry-list">
-        {faqs.map(([q, a]) => (
-          <details className="soft-card" key={q}>
-            <summary>{q}</summary>
-            <p>{a}</p>
-          </details>
-        ))}
+        {tr(
+          faqs.map(([q, a]) => (
+            <details className="soft-card" key={q}>
+              <summary>{tr(q)}</summary>
+              <p>{tr(a)}</p>
+            </details>
+          )),
+        )}
       </div>
       <Link className="primary-button section" to="/quiz">
-        Начать бесплатно ↗
+        {tr(
+          "\u041D\u0430\u0447\u0430\u0442\u044C \u0431\u0435\u0441\u043F\u043B\u0430\u0442\u043D\u043E \u2197",
+        )}
       </Link>
     </section>
   );

@@ -1,0 +1,243 @@
+{
+  "version": "1.0",
+  "brand": "Numerologic",
+  "editorial_role": "Marketing psychology editorial perspective; no clinical claims",
+  "hooks": [
+    {
+      "id": "your_next_step",
+      "ru": "Ваши числа. Ваши слова. Ваш следующий шаг.",
+      "en": "Your numbers. Your words. Your next step.",
+      "why_ru": "Связывает интерес к карте с личным ответом и конкретным действием. Решение остается у человека.",
+      "feature": "chart_journal_goals"
+    },
+    {
+      "id": "make_room",
+      "ru": "Что вы хотите оставить в сегодняшнем дне для себя?",
+      "en": "What would you like to make room for today?",
+      "why_ru": "Приглашает выбрать небольшую личную цель без предположений о чувствах или обстоятельствах.",
+      "feature": "goals_calendar"
+    },
+    {
+      "id": "one_line",
+      "ru": "Одна строка о том, что вам сегодня важно.",
+      "en": "One line about what matters to you today.",
+      "why_ru": "Начало понятно и посильно. В центре то, что человек сам считает важным.",
+      "feature": "journal"
+    },
+    {
+      "id": "own_words",
+      "ru": "Откройте карту. Продолжите своими словами.",
+      "en": "Open your chart. Continue in your own words.",
+      "why_ru": "Карта вызывает любопытство, а запись сохраняет свободу интерпретации.",
+      "feature": "chart_journal"
+    },
+    {
+      "id": "small_step",
+      "ru": "Какой маленький шаг вы выберете сегодня?",
+      "en": "What small step will you choose today?",
+      "why_ru": "Открытый вопрос предлагает действие без требования стать лучше или изменить жизнь.",
+      "feature": "goals"
+    },
+    {
+      "id": "return_to_note",
+      "ru": "Сохраните мысль, к которой хочется вернуться.",
+      "en": "Save a thought you’d like to return to.",
+      "why_ru": "Показывает понятную ценность сохранения личной записи.",
+      "feature": "journal"
+    },
+    {
+      "id": "personal_ritual",
+      "ru": "Выберите свой маленький ритуал на эту неделю.",
+      "en": "Choose a small ritual for your week.",
+      "why_ru": "Предлагает личный выбор и ограниченный горизонт. Ритуал здесь — выбранное регулярное действие.",
+      "feature": "rituals_weekly_practices"
+    },
+    {
+      "id": "record_of_steps",
+      "ru": "Ваши маленькие шаги заслуживают своей истории.",
+      "en": "Your small steps deserve a place in your story.",
+      "why_ru": "Тепло признает ценность обычных действий. На экране показываем сохраненные записи, не гарантированный прогресс.",
+      "feature": "journal_monthly_overview"
+    },
+    {
+      "id": "leave_space",
+      "ru": "В календаре можно оставить место и для своих планов.",
+      "en": "Your calendar can hold your own plans, too.",
+      "why_ru": "Связывает привычный инструмент с личным выбором без обвинений за занятость.",
+      "feature": "calendar_goals"
+    },
+    {
+      "id": "keep_what_fits",
+      "ru": "Какая практика из этой недели вам подходит?",
+      "en": "Which practice from this week feels right for you?",
+      "why_ru": "Оставляет возможность оценить практику и выбрать продолжение.",
+      "feature": "weekly_practices"
+    },
+    {
+      "id": "see_your_notes",
+      "ru": "Что вы замечаете, когда перечитываете свои записи?",
+      "en": "What do you notice when you reread your notes?",
+      "why_ru": "Обращается к собственным наблюдениям человека, не объявляя за него выводов.",
+      "feature": "journal_monthly_overview"
+    },
+    {
+      "id": "one_day",
+      "ru": "Начните с одного дня. Выберите, что сохранить.",
+      "en": "Start with one day. Choose what to keep.",
+      "why_ru": "Снижает объем первого шага и подчеркивает добровольность дальнейшего использования.",
+      "feature": "thirty_day_program"
+    }
+  ],
+  "short_scenes": [
+    {
+      "id": "chart_to_words",
+      "seconds": 12,
+      "visual_ru": "Дата с пометкой «Демо» → реальная карта чисел → поле дневника с одной строкой.",
+      "ru": "Ваши числа. Ваши слова. Ваш следующий шаг. Откройте карту Numerologic и запишите, что вам откликается.",
+      "en": "Your numbers. Your words. Your next step. Open your Numerologic chart and write down what resonates with you.",
+      "cta_ru": "Открыть бесплатную карту",
+      "cta_en": "Open your free chart"
+    },
+    {
+      "id": "calendar_space",
+      "seconds": 12,
+      "visual_ru": "Календарь с демонстрационными событиями → небольшая цель «Прочитать 10 страниц» → выбранная дата.",
+      "ru": "Что вы хотите оставить в сегодняшнем дне для себя? Запишите маленькую цель и найдите для нее место в календаре.",
+      "en": "What would you like to make room for today? Write down a small goal and give it a place in your calendar.",
+      "cta_ru": "Попробовать 7 дней",
+      "cta_en": "Try it for 7 days"
+    },
+    {
+      "id": "one_line_evening",
+      "seconds": 10,
+      "visual_ru": "Реальный экран дневника. Демонстрационная запись «Сегодня хочу сохранить идею для проекта». Дата записи.",
+      "ru": "Одна строка о том, что вам сегодня важно. Сохраните мысль, к которой хочется вернуться.",
+      "en": "One line about what matters to you today. Save a thought you’d like to return to.",
+      "cta_ru": "Открыть дневник",
+      "cta_en": "Open your journal"
+    },
+    {
+      "id": "weekly_ritual",
+      "seconds": 12,
+      "visual_ru": "Практика недели → выбранный небольшой ритуал → его запись в приложении. Без ряда идеальных ежедневных отметок.",
+      "ru": "Выберите свой маленький ритуал на эту неделю. Попробуйте практику и запишите, подходит ли она вам.",
+      "en": "Choose a small ritual for your week. Try a practice and note whether it works for you.",
+      "cta_ru": "Выбрать практику",
+      "cta_en": "Choose a practice"
+    },
+    {
+      "id": "month_of_notes",
+      "seconds": 12,
+      "visual_ru": "Несколько демонстрационных записей разных дат → реальный обзор месяца. Ясная пометка «Пример записей».",
+      "ru": "Ваши маленькие шаги заслуживают своей истории. Вернитесь к записям и выберите, что хотите продолжить.",
+      "en": "Your small steps deserve a place in your story. Revisit your notes and choose what you’d like to continue.",
+      "cta_ru": "Посмотреть инструменты",
+      "cta_en": "Explore the tools"
+    },
+    {
+      "id": "seven_day_invitation",
+      "seconds": 12,
+      "visual_ru": "Карта → дневник → цели → финальная карточка с условиями пробного доступа, читаемыми без паузы.",
+      "ru": "Познакомьтесь с Numerologic в своем темпе. После регистрации — 7 дней полного доступа без банковской карты. Один пробный период на аккаунт.",
+      "en": "Explore Numerologic at your own pace. Register for 7 days of full access with no payment card. One trial per account.",
+      "cta_ru": "Начать пробный период",
+      "cta_en": "Start your trial"
+    }
+  ],
+  "landing_headlines": [
+    {
+      "id": "a_chart",
+      "ru": "Карта ваших чисел и место для собственных наблюдений",
+      "en": "Your numerology chart and a place for your own observations",
+      "subhead_ru": "Откройте бесплатную карту. Сохраняйте мысли в дневнике и выбирайте личные цели в Numerologic.",
+      "subhead_en": "Open your free chart. Save thoughts in your journal and choose personal goals in Numerologic."
+    },
+    {
+      "id": "a_concrete",
+      "ru": "Нумерологическая карта, дневник и ваши следующие шаги",
+      "en": "A numerology chart, a journal, and your next steps",
+      "subhead_ru": "Расчет чисел по дате рождения, PDF-отчеты, цели, календарь и практики недели в одном приложении.",
+      "subhead_en": "Birth-date number calculations, PDF reports, goals, a calendar, and weekly practices in one app."
+    },
+    {
+      "id": "b_journal",
+      "ru": "Дневник, цели и маленькие практики для ваших дней",
+      "en": "A journal, goals, and small practices for your days",
+      "subhead_ru": "Записывайте важное, планируйте шаги и возвращайтесь к своим наблюдениям. 7 дней полного доступа после регистрации, без банковской карты.",
+      "subhead_en": "Save what matters, plan your next steps, and revisit your observations. Register for 7 days of full access with no payment card."
+    },
+    {
+      "id": "b_month",
+      "ru": "Ваши записи, привычки и обзор месяца в Numerologic",
+      "en": "Your notes, habits, and monthly overview in Numerologic",
+      "subhead_ru": "Выберите ритуал, попробуйте программу на 30 дней и сохраните свои наблюдения. Один пробный период на аккаунт.",
+      "subhead_en": "Choose a ritual, explore the 30-day program, and save your observations. One trial per account."
+    }
+  ],
+  "long_term_value": [
+    {
+      "id": "personal_record",
+      "ru": "Личная история записей: можно вернуться к мыслям, примерам и выбранным целям.",
+      "en": "A personal record: return to your thoughts, examples, and chosen goals."
+    },
+    {
+      "id": "repeatable_practice",
+      "ru": "Повод возвращаться: свои привычки, выбранные ритуалы и практики недели.",
+      "en": "Reasons to return: your habits, chosen rituals, and weekly practices."
+    },
+    {
+      "id": "monthly_review",
+      "ru": "Обзор месяца: перечитать записи и выбрать, что оставить в следующем месяце.",
+      "en": "A monthly review: reread your notes and choose what to carry into next month."
+    }
+  ],
+  "ab_hypotheses": [
+    {
+      "id": "entry_angle",
+      "hypothesis_ru": "У аудитории с интересом к нумерологии конкретная карта может чаще вести к первому расчету, чем общий эмоциональный заголовок.",
+      "a": "a_chart",
+      "b": "your_next_step",
+      "primary_metric": "unique visitors who complete their first chart / eligible unique visitors",
+      "secondary_metric": "first journal save within 7 days of registration",
+      "control_ru": "Менять только заголовок; сохранить источник трафика, CTA и остальную страницу."
+    },
+    {
+      "id": "first_action",
+      "hypothesis_ru": "Пример одной строки может чаще вести к первой сохраненной записи, чем приглашение начать программу на 30 дней.",
+      "a": "one_line",
+      "b": "one_day",
+      "primary_metric": "accounts that save a first journal entry within 24 hours / accounts shown the variant",
+      "secondary_metric": "accounts with a meaningful journal or practice action on a later day during the trial",
+      "control_ru": "Менять только приглашение к первому действию; условия пробного периода одинаковы."
+    },
+    {
+      "id": "return_reason",
+      "hypothesis_ru": "Предложение перечитать свои записи может чаще приводить к обзору месяца, чем общее приглашение открыть приложение.",
+      "a": "see_your_notes",
+      "b": "Open Numerologic / Открыть Numerologic",
+      "primary_metric": "accounts that open the monthly overview and complete its reflection action / eligible accounts shown the variant",
+      "secondary_metric": "meaningful use on a later day",
+      "control_ru": "Проверять среди аккаунтов с собственными записями; одинаковые канал и частота. Не объявлять победителя по кликам без действия."
+    }
+  ],
+  "offer_facts": {
+    "trial_days": 7,
+    "payment_card_required": false,
+    "trial_limit": "one per account",
+    "free_core_available": true,
+    "club_price_rub": 1190,
+    "club_period_days": 30,
+    "payments_enabled": false,
+    "live_ai_enabled": false,
+    "ru": "Базовые функции бесплатны. После регистрации — один полный пробный период на 7 дней без банковской карты. Клуб: 1 190 ₽ за 30 дней; оплата пока недоступна.",
+    "en": "Core features are free. Registration includes one 7-day full trial with no payment card. Club: RUB 1,190 for 30 days; payments are currently unavailable."
+  },
+  "editorial_constraints": [
+    "Numbers are a symbolic reflection framework; avoid scientific, clinical, diagnostic, predictive, or guaranteed outcome claims.",
+    "Present choices and prompts without assigning a mental state, personality, or destiny to the viewer.",
+    "Use real app screens and clearly labelled sample data. Never portray stock models as customers.",
+    "No fabricated testimonials, popularity counts, urgency, or performance statistics.",
+    "Show habits, rituals, the 30-day program, and monthly overview only after the implementation is verified.",
+    "Do not advertise active payment or live AI features while they are disabled."
+  ]
+}

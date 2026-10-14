@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `cloud_platform_identity` ON `cloud_records` (`kind`,`key`) WHERE "cloud_records"."kind" = 'platform_identity';

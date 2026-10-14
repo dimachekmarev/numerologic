@@ -1,0 +1,357 @@
+.number-orbit-card {
+  border: 1px solid #ddd7e7;
+  border-radius: 22px;
+  padding: 35px;
+  margin-bottom: 25px;
+  background:
+    radial-gradient(ellipse at 15% 50%, #ece5f580, transparent 58%), #fdfbf8;
+  box-shadow: 0 10px 35px #44344f05;
+}
+.number-orbit-heading {
+  max-width: 670px;
+}
+.number-orbit-heading .eyebrow {
+  margin-bottom: 14px;
+}
+.number-orbit-heading h2 {
+  font-size: clamp(1.65rem, 3vw, 2.4rem);
+  line-height: 1.12;
+}
+.number-orbit-heading > p {
+  font-size: 0.85rem;
+  margin-top: 14px;
+  max-width: 530px;
+}
+.number-orbit-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 55px;
+  align-items: center;
+}
+.number-orbit-visual {
+  min-width: 0;
+}
+.number-orbit-map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 540px;
+  margin-inline: auto;
+}
+.number-orbit-lines {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: #a18cb7;
+  pointer-events: none;
+}
+.number-orbit-selected-line {
+  color: #9982af;
+}
+.number-orbit-node {
+  position: absolute;
+  left: var(--node-x);
+  top: var(--node-y);
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 68px;
+  height: 68px;
+  padding: 0;
+  border: 1px solid #cabed8;
+  border-radius: 50%;
+  color: #776188;
+  background: linear-gradient(135deg, #fffefa, #f0e9f7);
+  box-shadow: 0 4px 12px #5a436e0a;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.number-orbit-node:hover {
+  background: #e9def4;
+  border-color: #9b7eb3;
+  box-shadow: 0 4px 17px #5a436e15;
+}
+.number-orbit-node.is-selected {
+  color: #fcfaf6;
+  background: #675477;
+  border-color: #675477;
+  box-shadow:
+    0 0 0 5px #9a7fb31a,
+    0 9px 25px #5d477018;
+}
+.number-orbit-node:focus-visible {
+  outline: 3px solid #8d72a4;
+  outline-offset: 7px;
+}
+.number-orbit-node:disabled {
+  cursor: default;
+  color: #a198a8;
+  opacity: 0.7;
+}
+.number-orbit-node-value {
+  font-family: Georgia, serif;
+  font-size: 31px;
+  letter-spacing: -0.06em;
+  font-weight: 400;
+  line-height: 1;
+}
+.number-orbit-node-label {
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 104px;
+  font-size: 10px;
+  color: #7a6b86;
+  line-height: 1.35;
+  font-weight: 450;
+}
+.number-orbit-node.is-selected .number-orbit-node-label {
+  color: #53425f;
+  font-weight: 550;
+}
+.number-orbit-center {
+  width: 116px;
+  height: 116px;
+  background: radial-gradient(circle at 30% 25%, #fffdfb, #e8ddef);
+  border-color: #cbbdd8;
+}
+.number-orbit-center .number-orbit-node-value {
+  font-size: 62px;
+}
+.number-orbit-center .number-orbit-node-label {
+  font-size: 10px;
+  top: calc(100% + 10px);
+  width: 115px;
+}
+.number-orbit-hint {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.67rem !important;
+  margin-top: -8px !important;
+  color: #82758d !important;
+}
+.number-orbit-hint > span {
+  font-size: 17px;
+}
+.number-orbit-detail {
+  padding: 29px;
+  border-radius: 16px;
+  border: 1px solid #e1d9e9;
+  background: #f7f3fa;
+}
+.number-orbit-detail-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 23px;
+  margin-bottom: 23px;
+  border-bottom: 1px solid #e0d7e9;
+}
+.number-orbit-detail-value {
+  font-family: Georgia, serif;
+  color: #7e658f;
+  font-size: 57px;
+  line-height: 1;
+  letter-spacing: -0.065em;
+}
+.number-orbit-detail-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #54425f;
+}
+.number-orbit-master {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8c769d;
+  margin-top: 7px;
+}
+.number-orbit-caption {
+  display: block;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #867394;
+  font-weight: 500;
+}
+.number-orbit-detail h3 {
+  font-size: 1.6rem;
+  font-weight: 450;
+  line-height: 1.18;
+  text-transform: capitalize;
+  margin: 12px 0 17px;
+  color: #54425f;
+}
+.number-orbit-detail > p {
+  font-size: 0.83rem;
+  color: #7a6c86;
+}
+.number-orbit-journal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding-top: 17px;
+  margin-top: 23px;
+  border-top: 1px solid #e0d7e9;
+  color: #685174;
+  font-size: 0.76rem;
+}
+.number-orbit-journal:hover {
+  color: #392642;
+}
+.number-orbit-journal > span {
+  font-size: 19px;
+}
+.number-orbit-arithmetic {
+  border-top: 1px solid #e2dce9;
+  margin-top: 28px;
+  padding-top: 22px;
+}
+.number-orbit-arithmetic > p {
+  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  color: #645472;
+  margin: 10px 0 7px;
+  overflow-wrap: anywhere;
+}
+.number-orbit-arithmetic > small {
+  display: block;
+  font-size: 0.67rem;
+  color: #7c7087;
+}
+@media (max-width: 1000px) {
+  .number-orbit-layout {
+    gap: 28px;
+    grid-template-columns: 1.15fr 1fr;
+  }
+  .number-orbit-card {
+    padding: 28px;
+  }
+  .number-orbit-node {
+    width: 61px;
+    height: 61px;
+  }
+  .number-orbit-center {
+    width: 100px;
+    height: 100px;
+  }
+  .number-orbit-center .number-orbit-node-value {
+    font-size: 53px;
+  }
+  .number-orbit-detail {
+    padding: 23px;
+  }
+  .number-orbit-detail h3 {
+    font-size: 1.4rem;
+  }
+}
+@media (max-width: 760px) {
+  .number-orbit-layout {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .number-orbit-heading {
+    max-width: 550px;
+  }
+  .number-orbit-map {
+    max-width: 470px;
+  }
+  .number-orbit-visual {
+    margin-top: 20px;
+  }
+  .number-orbit-node {
+    width: 67px;
+    height: 67px;
+  }
+  .number-orbit-center {
+    width: 112px;
+    height: 112px;
+  }
+  .number-orbit-center .number-orbit-node-value {
+    font-size: 61px;
+  }
+  .number-orbit-detail {
+    max-width: 550px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .number-orbit-detail h3 {
+    font-size: 1.55rem;
+  }
+}
+@media (max-width: 480px) {
+  .number-orbit-card {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+  .number-orbit-heading h2 {
+    font-size: 1.7rem;
+  }
+  .number-orbit-heading > p {
+    font-size: 0.78rem;
+  }
+  .number-orbit-node {
+    width: 53px;
+    height: 53px;
+  }
+  .number-orbit-node-value {
+    font-size: 27px;
+  }
+  .number-orbit-node-label {
+    font-size: 8px;
+    width: 84px;
+    top: calc(100% + 7px);
+  }
+  .number-orbit-center {
+    width: 86px;
+    height: 86px;
+  }
+  .number-orbit-center .number-orbit-node-value {
+    font-size: 46px;
+  }
+  .number-orbit-center .number-orbit-node-label {
+    font-size: 8px;
+    width: 92px;
+    top: calc(100% + 7px);
+  }
+  .number-orbit-hint {
+    font-size: 0.6rem !important;
+    margin-top: 8px !important;
+  }
+  .number-orbit-detail {
+    padding: 22px;
+    border-radius: 12px;
+  }
+  .number-orbit-detail-label {
+    font-size: 0.82rem;
+  }
+  .number-orbit-detail h3 {
+    font-size: 1.4rem;
+  }
+  .number-orbit-detail > p {
+    font-size: 0.78rem;
+  }
+  .number-orbit-journal {
+    font-size: 0.73rem;
+  }
+  .number-orbit-arithmetic > p {
+    font-size: 0.73rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .number-orbit-card *,
+  .number-orbit-card *::before,
+  .number-orbit-card *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

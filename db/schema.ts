@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import { sqliteTable, integer, text, uniqueIndex, index } from 'drizzle-orm/sqlite-core';
 export const accounts = sqliteTable('cloud_accounts', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -18,7 +19,7 @@ export const records = sqliteTable('cloud_records', {
   kind: text('kind').notNull(),
   key: text('key').notNull(),
   data: text('data').notNull(),
-}, t => [uniqueIndex('cloud_records_owner_kind_key').on(t.owner, t.kind, t.key)]);
+}, t => [uniqueIndex('cloud_records_owner_kind_key').on(t.owner, t.kind, t.key),uniqueIndex('cloud_platform_identity').on(t.kind,t.key).where(sql`${t.kind} = 'platform_identity'`)]);
 export const rates = sqliteTable('cloud_rates', {
   key: text('key').primaryKey(),
   count: integer('count').notNull(),

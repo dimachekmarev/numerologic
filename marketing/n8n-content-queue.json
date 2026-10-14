@@ -1,0 +1,295 @@
+{
+  "name": "Numerologic — 30-day content queue (draft by default)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual",
+      "name": "Manual draft run",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "schedule",
+      "name": "Daily queue 09 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Import is inactive. Keep live_enabled false until the live checklist is completed.\nreturn [{json:{\n  mode: 'draft',\n  live_enabled: false,\n  campaign_day: 1,\n  launch_date: null, // UTC YYYY-MM-DD; when set, campaign day follows elapsed calendar days.\n  selected_locales: ['ru','en'],\n  selected_variants: ['a','b'],\n  selected_channels: ['tiktok','youtube_shorts'],\n  approved_campaign_ids: [],\n  approved_channels: [],\n  final_asset_urls: {}, // campaign ID -> owned/licensed, public HTTPS video URL\n  adapter_url: '', // Your verified HTTPS adapter; intentionally no fabricated endpoint.\n  adapter_authorization_configured: false\n}}];"
+      },
+      "id": "config",
+      "name": "Campaign configuration",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://numerologic.dimachek777.chatgpt.site/api/marketing/campaigns",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "feed",
+      "name": "Get campaigns feed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('Campaign configuration').first().json;\nconst payload = $input.first().json;\nconst feed = Array.isArray(payload) ? {campaigns:payload} : payload;\nif (!Array.isArray(feed.campaigns)) throw new Error('Campaign endpoint must return { campaigns: [...] }.');\nlet day = Number(cfg.campaign_day);\nif (cfg.launch_date) {\n  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(cfg.launch_date)) throw new Error('launch_date must be UTC YYYY-MM-DD.');\n  const start = Date.parse(cfg.launch_date+'T00:00:00Z');\n  if (!Number.isFinite(start)) throw new Error('Invalid launch_date.');\n  const today = Date.parse(new Date().toISOString().slice(0,10)+'T00:00:00Z');\n  day = Math.floor((today-start)/86400000)+1;\n}\nif (!Number.isInteger(day)) throw new Error('campaign_day must be an integer.');\nif (day < 1 || day > 30) return [];\nconst candidates = feed.campaigns.filter(c => c.day===day && cfg.selected_locales.includes(c.locale) && cfg.selected_variants.includes(c.variant) && cfg.selected_channels.includes(c.channel));\nif (!candidates.length) throw new Error('No campaign candidates match this selection.');\nreturn candidates.map(c => ({json:{\n  kind:'publication_draft', mode:cfg.live_enabled?'pending_live_review':'draft',\n  campaign_id:c.id, day:c.day, locale:c.locale, variant:c.variant, channel:c.channel,\n  hook:c.hook, video_script:c.video_script, caption:c.caption, cta:c.cta,\n  landing_url:c.utm_link, target_duration_seconds:c.target_duration_seconds,\n  visual_beats:c.visual_beats, format:c.format,\n  asset_url:cfg.final_asset_urls[c.id] || null,\n  idempotency_key:'numerologic:'+c.id,\n  requires:['rendered_video','voiceover_timing_check','subtitle_check','channel_and_account_review','explicit_campaign_approval'],\n  publication_status:'not_sent'\n}}));"
+      },
+      "id": "prepare",
+      "name": "Prepare reviewable queue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "live-true",
+              "leftValue": "={{ $('Campaign configuration').first().json.live_enabled }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if",
+      "name": "Live explicitly enabled",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(i => ({json:{...i.json, publication_status:'not_sent', review_instructions:'Review this draft. No video has been rendered, uploaded, or published.'}}));"
+      },
+      "id": "draft",
+      "name": "Draft output only",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('Campaign configuration').first().json;\nif (cfg.live_enabled !== true) throw new Error('Live mode is disabled.');\nif (cfg.mode !== 'live') throw new Error('Set mode to live explicitly after review.');\nif (!/^https:\\/\\//.test(cfg.adapter_url)) throw new Error('Set your verified HTTPS adapter_url.');\nif (cfg.adapter_authorization_configured !== true) throw new Error('Connect the HTTP Header Auth credential to the adapter node first.');\nreturn $input.all().map(item => {\n  const d = item.json;\n  if (!cfg.approved_channels.includes(d.channel)) throw new Error('Channel is not explicitly approved: '+d.channel);\n  if (!cfg.approved_campaign_ids.includes(d.campaign_id)) throw new Error('Campaign is not explicitly approved: '+d.campaign_id);\n  if (!/^https:\\/\\//.test(d.asset_url || '')) throw new Error('Provide a reviewed HTTPS video asset URL for '+d.campaign_id);\n  return {json:{...d, mode:'live', adapter_url:cfg.adapter_url,\n    adapter_payload:{version:1, action:'prepare_or_publish',campaign_id:d.campaign_id,\n      idempotency_key:d.idempotency_key,channel:d.channel,locale:d.locale,\n      asset_url:d.asset_url,caption:d.caption,landing_url:d.landing_url,\n      approval:{approved:true,campaign_id:d.campaign_id},dry_run:false}}};\n});"
+      },
+      "id": "guard",
+      "name": "Require live approvals and assets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.adapter_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.adapter_payload) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "adapter",
+      "name": "Your verified generic adapter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        -80
+      ],
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => ({json:{kind:'adapter_response',received_at:new Date().toISOString(),adapter_response:item.json,note:'An HTTP response is not proof of publication. Use the adapter status and platform ID/URL; record only verified outcomes.'}}));"
+      },
+      "id": "result",
+      "name": "Preserve actual adapter status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Safe default\nImported inactive. Manual execution fetches the owned campaign feed and produces drafts. Nothing is uploaded or published.\n\nTo connect live: follow marketing/PLAYBOOK.md; configure your real adapter, HTTP Header Auth credential, explicit channel and campaign approvals, final video assets, and mode=live.\n\nSet launch_date before enabling the daily schedule. TikTok/YouTube integrations require their own approved APIs and account tokens.",
+        "height": 280,
+        "width": 450
+      },
+      "id": "note",
+      "name": "Read before enabling live",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        450,
+        340
+      ]
+    }
+  ],
+  "connections": {
+    "Manual draft run": {
+      "main": [
+        [
+          {
+            "node": "Campaign configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily queue 09 UTC": {
+      "main": [
+        [
+          {
+            "node": "Campaign configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Campaign configuration": {
+      "main": [
+        [
+          {
+            "node": "Get campaigns feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get campaigns feed": {
+      "main": [
+        [
+          {
+            "node": "Prepare reviewable queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare reviewable queue": {
+      "main": [
+        [
+          {
+            "node": "Live explicitly enabled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Live explicitly enabled": {
+      "main": [
+        [
+          {
+            "node": "Require live approvals and assets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Draft output only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Require live approvals and assets": {
+      "main": [
+        [
+          {
+            "node": "Your verified generic adapter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Your verified generic adapter": {
+      "main": [
+        [
+          {
+            "node": "Preserve actual adapter status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Etc/UTC"
+  },
+  "pinData": {},
+  "tags": []
+}

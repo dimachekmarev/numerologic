@@ -1,0 +1,6 @@
+const fs=require('fs'),path=require('path');
+const babel=require('../frontend/node_modules/@babel/core');
+const strings=new Set();const re=/[А-Яа-яЁё]/;
+for(const folder of ['frontend/src/pages','frontend/src/components'])for(const file of fs.readdirSync(folder)){if(!file.endsWith('.jsx')||file==='Landing.jsx'||file==='LanguageSwitch.jsx')continue;const src=fs.readFileSync(path.join(folder,file),'utf8');babel.transformSync(src,{configFile:false,babelrc:false,parserOpts:{plugins:['jsx']},plugins:[()=>({visitor:{JSXText(p){const v=p.node.value.replace(/\s+/g,' ').trim();if(re.test(v))strings.add(v);},StringLiteral(p){if(re.test(p.node.value))strings.add(p.node.value);},TemplateElement(p){if(re.test(p.node.value.raw))strings.add(p.node.value.raw);}}})]});}
+for(const file of ['backend/catalog.json','backend/library.json','hosting/symbolic.json']){function scan(v){if(typeof v==='string'&&re.test(v))strings.add(v);else if(Array.isArray(v))v.forEach(scan);else if(v&&typeof v==='object')Object.values(v).forEach(scan);}scan(JSON.parse(fs.readFileSync(file,'utf8')));}
+fs.writeFileSync('localization/ru-strings.json',JSON.stringify([...strings].sort(),null,2));console.log(strings.size+' translatable strings');

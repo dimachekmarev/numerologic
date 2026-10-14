@@ -1,3 +1,4 @@
+import { useI18n } from "../i18n";
 import { Link } from "react-router-dom";
 import { api } from "../api";
 import { useLoad } from "../hooks";
@@ -5,6 +6,7 @@ import Status from "../components/Status";
 import ReportCard from "../components/ReportCard";
 import TrialAccess from "../components/TrialAccess";
 export default function Dashboard() {
+  const { t: tr } = useI18n();
   const state = useLoad(api.dashboard),
     week = useLoad(api.weekly);
   if (!state.data)
@@ -19,106 +21,199 @@ export default function Dashboard() {
     <section className="section">
       <div className="section-heading split">
         <div>
-          <span className="eyebrow">Ваше личное пространство</span>
+          <span className="eyebrow">
+            {tr(
+              "\u0412\u0430\u0448\u0435 \u043B\u0438\u0447\u043D\u043E\u0435 \u043F\u0440\u043E\u0441\u0442\u0440\u0430\u043D\u0441\u0442\u0432\u043E",
+            )}
+          </span>
           <h1>
-            {d.user.name === "Гость"
-              ? "Начните с себя."
-              : `${d.user.name}, добро пожаловать.`}
+            {tr(
+              d.user.name === "Гость"
+                ? "Начните с себя."
+                : `${d.user.name}, добро пожаловать.`,
+            )}
           </h1>
-          <p>Карта, мысли и маленькие шаги — всё сохраняется здесь.</p>
+          <p>
+            {tr(
+              "\u041A\u0430\u0440\u0442\u0430, \u043C\u044B\u0441\u043B\u0438 \u0438 \u043C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0435 \u0448\u0430\u0433\u0438 \u2014 \u0432\u0441\u0451 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0435\u0442\u0441\u044F \u0437\u0434\u0435\u0441\u044C.",
+            )}
+          </p>
         </div>
         <Link className="secondary-button" to="/account">
-          Настройки аккаунта ↗
+          {tr(
+            "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 \u0430\u043A\u043A\u0430\u0443\u043D\u0442\u0430 \u2197",
+          )}
         </Link>
       </div>
-      {(!p || !d.user.registered) && (
-        <article className="soft-card setup-card">
-          <h3>Два шага, чтобы начать</h3>
-          <div className="hero-actions">
-            <Link
-              className={p ? "secondary-button" : "primary-button"}
-              to="/quiz"
-            >
-              {p ? "✓" : "01"} Заполнить профиль
-            </Link>
-            <Link
-              className={
-                d.user.registered ? "secondary-button" : "primary-button"
-              }
-              to="/account"
-            >
-              {d.user.registered ? "✓" : "02"} Сохранить аккаунт
-            </Link>
-          </div>
-          <p>
-            В гостевом режиме записи привязаны к этому браузеру. Сохраните
-            аккаунт для входа на других устройствах.
-          </p>
-        </article>
+      {tr(
+        (!p || !d.user.registered) && (
+          <article className="soft-card setup-card">
+            <h3>
+              {tr(
+                "\u0414\u0432\u0430 \u0448\u0430\u0433\u0430, \u0447\u0442\u043E\u0431\u044B \u043D\u0430\u0447\u0430\u0442\u044C",
+              )}
+            </h3>
+            <div className="hero-actions">
+              <Link
+                className={p ? "secondary-button" : "primary-button"}
+                to="/quiz"
+              >
+                {tr(p ? "✓" : "01")}
+                {tr(
+                  "\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u044C \u043F\u0440\u043E\u0444\u0438\u043B\u044C",
+                )}
+              </Link>
+              <Link
+                className={
+                  d.user.registered ? "secondary-button" : "primary-button"
+                }
+                to="/account"
+              >
+                {tr(d.user.registered ? "✓" : "02")}
+                {tr(
+                  "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0430\u043A\u043A\u0430\u0443\u043D\u0442",
+                )}
+              </Link>
+            </div>
+            <p>
+              {tr(
+                "\u0412 \u0433\u043E\u0441\u0442\u0435\u0432\u043E\u043C \u0440\u0435\u0436\u0438\u043C\u0435 \u0437\u0430\u043F\u0438\u0441\u0438 \u043F\u0440\u0438\u0432\u044F\u0437\u0430\u043D\u044B \u043A \u044D\u0442\u043E\u043C\u0443 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0443. \u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u0435 \u0430\u043A\u043A\u0430\u0443\u043D\u0442 \u0434\u043B\u044F \u0432\u0445\u043E\u0434\u0430 \u043D\u0430 \u0434\u0440\u0443\u0433\u0438\u0445 \u0443\u0441\u0442\u0440\u043E\u0439\u0441\u0442\u0432\u0430\u0445.",
+              )}
+            </p>
+          </article>
+        ),
       )}
       <div className="dashboard-grid">
         <Link className="soft-card feature-card map-preview" to="/numbers">
-          <span className="chip">Моя карта чисел</span>
-          {p ? (
-            <>
-              <div className="numbers-row">
-                <div>
-                  <strong>{p.life_path}</strong>
-                  <span>путь</span>
+          <span className="chip">
+            {tr(
+              "\u041C\u043E\u044F \u043A\u0430\u0440\u0442\u0430 \u0447\u0438\u0441\u0435\u043B",
+            )}
+          </span>
+          {tr(
+            p ? (
+              <>
+                <div className="numbers-row">
+                  <div>
+                    <strong>{tr(p.life_path)}</strong>
+                    <span>{tr("\u043F\u0443\u0442\u044C")}</span>
+                  </div>
+                  <div>
+                    <strong>{tr(p.month)}</strong>
+                    <span>{tr("\u043C\u0435\u0441\u044F\u0446")}</span>
+                  </div>
                 </div>
-                <div>
-                  <strong>{p.month}</strong>
-                  <span>месяц</span>
-                </div>
-              </div>
-              <h3>{p.meaning}</h3>
-              <p>{p.arithmetic}</p>
-            </>
-          ) : (
-            <p>Имя и дата рождения — начало вашей карты.</p>
+                <h3>{tr(p.meaning)}</h3>
+                <p>{tr(p.arithmetic)}</p>
+              </>
+            ) : (
+              <p>
+                {tr(
+                  "\u0418\u043C\u044F \u0438 \u0434\u0430\u0442\u0430 \u0440\u043E\u0436\u0434\u0435\u043D\u0438\u044F \u2014 \u043D\u0430\u0447\u0430\u043B\u043E \u0432\u0430\u0448\u0435\u0439 \u043A\u0430\u0440\u0442\u044B.",
+                )}
+              </p>
+            ),
           )}
-          <span className="ghost-button">Открыть карту ↗</span>
+          <span className="ghost-button">
+            {tr(
+              "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043A\u0430\u0440\u0442\u0443 \u2197",
+            )}
+          </span>
         </Link>
         <Link className="soft-card feature-card" to="/weekly">
-          <span className="chip">Моя неделя</span>
-          <h2>{week.data?.entries || 0} наблюдений</h2>
+          <span className="chip">
+            {tr("\u041C\u043E\u044F \u043D\u0435\u0434\u0435\u043B\u044F")}
+          </span>
+          <h2>
+            {tr(week.data?.entries || 0)}
+            {tr("\u043D\u0430\u0431\u043B\u044E\u0434\u0435\u043D\u0438\u0439")}
+          </h2>
           <p>
-            {week.data?.steps || 0} шагов за последние семь дней.{" "}
-            {week.data?.streak || 0} дней записей подряд.
+            {tr(week.data?.steps || 0)}
+            {tr(
+              "\u0448\u0430\u0433\u043E\u0432 \u0437\u0430 \u043F\u043E\u0441\u043B\u0435\u0434\u043D\u0438\u0435 \u0441\u0435\u043C\u044C \u0434\u043D\u0435\u0439.",
+            )}
+            {tr(" ")}
+            {tr(week.data?.streak || 0)}
+            {tr(
+              "\u0434\u043D\u0435\u0439 \u0437\u0430\u043F\u0438\u0441\u0435\u0439 \u043F\u043E\u0434\u0440\u044F\u0434.",
+            )}
           </p>
-          <span className="ghost-button">Посмотреть обзор ↗</span>
+          <span className="ghost-button">
+            {tr(
+              "\u041F\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u0442\u044C \u043E\u0431\u0437\u043E\u0440 \u2197",
+            )}
+          </span>
         </Link>
         <article className="soft-card feature-card tint-lavender">
-          <span className="chip">Продолжить сегодня</span>
-          <h2>Пять минут для себя.</h2>
+          <span className="chip">
+            {tr(
+              "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C \u0441\u0435\u0433\u043E\u0434\u043D\u044F",
+            )}
+          </span>
+          <h2>
+            {tr(
+              "\u041F\u044F\u0442\u044C \u043C\u0438\u043D\u0443\u0442 \u0434\u043B\u044F \u0441\u0435\u0431\u044F.",
+            )}
+          </h2>
           <p>
-            Посмотрите тему дня, выберите упражнение и сохраните одну мысль.
+            {tr(
+              "\u041F\u043E\u0441\u043C\u043E\u0442\u0440\u0438\u0442\u0435 \u0442\u0435\u043C\u0443 \u0434\u043D\u044F, \u0432\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0443\u043F\u0440\u0430\u0436\u043D\u0435\u043D\u0438\u0435 \u0438 \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u0435 \u043E\u0434\u043D\u0443 \u043C\u044B\u0441\u043B\u044C.",
+            )}
           </p>
           <Link className="primary-button" to="/today">
-            Мой день ↗
+            {tr("\u041C\u043E\u0439 \u0434\u0435\u043D\u044C \u2197")}
           </Link>
           <Link className="ghost-button" to="/journal">
-            Открыть дневник
+            {tr(
+              "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0434\u043D\u0435\u0432\u043D\u0438\u043A",
+            )}
           </Link>
         </article>
       </div>
+      <div className="hero-actions section">
+        <Link className="primary-button" to="/rituals">
+          {tr("Мои ритуалы и месяц")} ↗
+        </Link>
+        <Link className="secondary-button" to="/practices/self-discovery-30">
+          {tr("30 дней для себя")} ↗
+        </Link>
+      </div>
       <TrialAccess onChanged={state.reload} />
       <div className="section-heading section">
-        <h2>Ваши материалы</h2>
-        <p>Сформированные материалы и PDF сохраняются в кабинете.</p>
+        <h2>
+          {tr(
+            "\u0412\u0430\u0448\u0438 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u044B",
+          )}
+        </h2>
+        <p>
+          {tr(
+            "\u0421\u0444\u043E\u0440\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0435 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u044B \u0438 PDF \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u044E\u0442\u0441\u044F \u0432 \u043A\u0430\u0431\u0438\u043D\u0435\u0442\u0435.",
+          )}
+        </p>
       </div>
       <div className="reports-grid">
-        {d.reports.map((r) => (
-          <ReportCard key={r.id} report={r} />
-        ))}
-        {!d.reports.length && (
-          <article className="soft-card feature-card">
-            <h3>Выберите первый материал</h3>
-            <p>Практикумы, карта периода и вопросы для диалога.</p>
-            <Link className="primary-button" to="/products">
-              Посмотреть материалы ↗
-            </Link>
-          </article>
+        {tr(d.reports.map((r) => <ReportCard key={r.id} report={r} />))}
+        {tr(
+          !d.reports.length && (
+            <article className="soft-card feature-card">
+              <h3>
+                {tr(
+                  "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u043F\u0435\u0440\u0432\u044B\u0439 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B",
+                )}
+              </h3>
+              <p>
+                {tr(
+                  "\u041F\u0440\u0430\u043A\u0442\u0438\u043A\u0443\u043C\u044B, \u043A\u0430\u0440\u0442\u0430 \u043F\u0435\u0440\u0438\u043E\u0434\u0430 \u0438 \u0432\u043E\u043F\u0440\u043E\u0441\u044B \u0434\u043B\u044F \u0434\u0438\u0430\u043B\u043E\u0433\u0430.",
+                )}
+              </p>
+              <Link className="primary-button" to="/products">
+                {tr(
+                  "\u041F\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u0442\u044C \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u044B \u2197",
+                )}
+              </Link>
+            </article>
+          ),
         )}
       </div>
     </section>

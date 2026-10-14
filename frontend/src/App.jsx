@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
+import { useI18n } from "./i18n";
 import Home from "./pages/Home";
 import Quiz from "./pages/Quiz";
 import Result from "./pages/Result";
@@ -24,6 +25,10 @@ import ResetPassword from "./pages/ResetPassword";
 import Numbers from "./pages/Numbers";
 import Weekly from "./pages/Weekly";
 import "./App.css";
+import "./brand.css";
+import Landing from "./pages/Landing";
+import Rituals from "./pages/Rituals";
+import Marketing from "./pages/Marketing";
 
 function SimpleLegalPage({ title, children }) {
   return (
@@ -38,12 +43,18 @@ function SimpleLegalPage({ title, children }) {
 }
 
 export default function App() {
+  const { language } = useI18n();
+  const en = language === "en";
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
+        <Route path="landing-a" element={<Landing variant="a" />} />
+        <Route path="landing-b" element={<Landing variant="b" />} />
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="today" element={<Today />} />
+          <Route path="rituals" element={<Rituals />} />
+          <Route path="marketing" element={<Marketing />} />
           <Route path="numbers" element={<Numbers />} />
           <Route path="weekly" element={<Weekly />} />
           <Route path="journal" element={<Journal />} />
@@ -69,16 +80,22 @@ export default function App() {
           <Route
             path="privacy"
             element={
-              <SimpleLegalPage title="Политика конфиденциальности">
+              <SimpleLegalPage
+                title={en ? "Privacy policy" : "Политика конфиденциальности"}
+              >
                 <p>
-                  Мы используем имя, дату рождения, ответы опроса и контактные
+                  {en
+                    ? "We use your name, birth date, questionnaire answers and contact details to prepare materials, save results and process orders."
+                    : `Мы используем имя, дату рождения, ответы опроса и контактные
                   данные только для подготовки разборов, сохранения результатов
-                  и обработки заказов.
+                  и обработки заказов.`}
                 </p>
                 <p>
-                  Numerologic — инструмент саморефлексии. Данные не должны
+                  {en
+                    ? "Numerologic is a self-reflection tool. Do not use these materials for medical, legal, financial or other professional decisions without consulting a qualified professional."
+                    : `Numerologic — инструмент саморефлексии. Данные не должны
                   использоваться для медицинских, юридических, финансовых или
-                  иных профессиональных решений без консультации специалиста.
+                  иных профессиональных решений без консультации специалиста.`}
                 </p>
               </SimpleLegalPage>
             }
@@ -86,16 +103,22 @@ export default function App() {
           <Route
             path="terms"
             element={
-              <SimpleLegalPage title="Условия использования">
+              <SimpleLegalPage
+                title={en ? "Terms of use" : "Условия использования"}
+              >
                 <p>
-                  Сервис предоставляет нумерологические digital-разборы,
+                  {en
+                    ? "The service provides digital numerology readings, reflection prompts, compatibility materials and subscription content for self-reflection."
+                    : `Сервис предоставляет нумерологические digital-разборы,
                   мини-инсайты, совместимость и подписочные материалы в формате
-                  self-reflection продукта.
+                  self-reflection продукта.`}
                 </p>
                 <p>
-                  Разборы не являются предсказанием будущего и не заменяют
+                  {en
+                    ? "Readings do not predict the future or replace professional advice. You make your own decisions."
+                    : `Разборы не являются предсказанием будущего и не заменяют
                   профессиональные консультации. Решения пользователь принимает
-                  самостоятельно.
+                  самостоятельно.`}
                 </p>
               </SimpleLegalPage>
             }

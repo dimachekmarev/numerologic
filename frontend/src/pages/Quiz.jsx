@@ -1,8 +1,8 @@
+import { useI18n } from "../i18n";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { localDay } from "../hooks";
-
 const focusOptions = [
   "Ясность",
   "Отношения",
@@ -15,8 +15,8 @@ const relationshipOptions = [
   "выбираю себя",
   "сложно ответить",
 ];
-
 export default function Quiz() {
+  const { t: tr } = useI18n();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,6 @@ export default function Quiz() {
     question: "",
     email: "",
   });
-
   const steps = useMemo(
     () => [
       {
@@ -38,7 +37,11 @@ export default function Quiz() {
         type: "text",
         placeholder: "Например, Дмитрий",
       },
-      { title: "Дата рождения", field: "birth_date", type: "date" },
+      {
+        title: "Дата рождения",
+        field: "birth_date",
+        type: "date",
+      },
       {
         title: "Что хочется прояснить?",
         field: "focus",
@@ -58,18 +61,20 @@ export default function Quiz() {
     ],
     [],
   );
-
   const current = steps[step];
   const canContinue =
     current.options ||
+    current.field === "question" ||
     (String(form[current.field] || "").trim().length > 0 &&
       (current.type !== "date" ||
         (form.birth_date >= "1900-01-01" && form.birth_date <= localDay())));
-
   async function submit() {
     setLoading(true);
     try {
-      const payload = { ...form, email: form.email || undefined };
+      const payload = {
+        ...form,
+        email: form.email || undefined,
+      };
       const result = await api.completeQuiz(payload);
       localStorage.setItem("numerologic_quiz", JSON.stringify(payload));
       localStorage.setItem("numerologic_result", JSON.stringify(result));
@@ -81,74 +86,100 @@ export default function Quiz() {
       setLoading(false);
     }
   }
-
   function next() {
     if (step < steps.length - 1) setStep((value) => value + 1);
     else submit();
   }
-
   return (
     <section className="quiz-page narrow-page">
       <div className="progress-shell">
         <span>
-          Шаг {step + 1} из {steps.length}
+          {tr("Шаг")} {step + 1} {tr("из")} {steps.length}
         </span>
         <div className="progress-bar">
-          <i style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
+          <i
+            style={{
+              width: `${((step + 1) / steps.length) * 100}%`,
+            }}
+          />
         </div>
       </div>
       <article className="quiz-card glass-card">
-        <span className="eyebrow">Мини-разбор</span>
-        <h1>{current.title}</h1>
-        {current.options ? (
-          <div className="option-grid">
-            {current.options.map((option) => (
-              <button
-                key={option}
-                className={`option-card ${form[current.field] === option ? "selected" : ""}`}
-                onClick={() => setForm({ ...form, [current.field]: option })}
-                type="button"
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        ) : current.type === "textarea" ? (
-          <textarea
-            value={form[current.field]}
-            placeholder={current.placeholder}
-            onChange={(event) =>
-              setForm({ ...form, [current.field]: event.target.value })
-            }
-          />
-        ) : (
-          <input
-            aria-label={current.title}
-            min={current.type === "date" ? "1900-01-01" : undefined}
-            max={current.type === "date" ? localDay() : undefined}
-            maxLength={128}
-            type={current.type}
-            value={form[current.field]}
-            placeholder={current.placeholder}
-            onChange={(event) =>
-              setForm({ ...form, [current.field]: event.target.value })
-            }
-          />
+        <span className="eyebrow">
+          {tr("\u041C\u0438\u043D\u0438-\u0440\u0430\u0437\u0431\u043E\u0440")}
+        </span>
+        <h1>{tr(current.title)}</h1>
+        {tr(
+          current.options ? (
+            <div className="option-grid">
+              {tr(
+                current.options.map((option) => (
+                  <button
+                    key={option}
+                    className={`option-card ${form[current.field] === option ? "selected" : ""}`}
+                    onClick={() =>
+                      setForm({
+                        ...form,
+                        [current.field]: option,
+                      })
+                    }
+                    type="button"
+                  >
+                    {tr(option)}
+                  </button>
+                )),
+              )}
+            </div>
+          ) : current.type === "textarea" ? (
+            <textarea
+              value={form[current.field]}
+              placeholder={tr(current.placeholder)}
+              onChange={(event) =>
+                setForm({
+                  ...form,
+                  [current.field]: event.target.value,
+                })
+              }
+            />
+          ) : (
+            <input
+              aria-label={tr(current.title)}
+              min={current.type === "date" ? "1900-01-01" : undefined}
+              max={current.type === "date" ? localDay() : undefined}
+              maxLength={128}
+              type={current.type}
+              value={form[current.field]}
+              placeholder={tr(current.placeholder)}
+              onChange={(event) =>
+                setForm({
+                  ...form,
+                  [current.field]: event.target.value,
+                })
+              }
+            />
+          ),
         )}
-        {step === steps.length - 1 && (
-          <input
-            type="email"
-            value={form.email}
-            placeholder="Email (необязательно)"
-            onChange={(event) =>
-              setForm({ ...form, email: event.target.value })
-            }
-          />
+        {tr(
+          step === steps.length - 1 && (
+            <input
+              type="email"
+              value={form.email}
+              placeholder={tr("Email (необязательно)")}
+              onChange={(event) =>
+                setForm({
+                  ...form,
+                  email: event.target.value,
+                })
+              }
+            />
+          ),
         )}
-        {error && (
-          <p role="alert" className="error">
-            {error}
-          </p>
+        {tr(
+          error && (
+            <p role="alert" className="error">
+              {tr(error)}
+            </p>
+          ),
         )}
         <div className="quiz-actions">
           <button
@@ -156,18 +187,20 @@ export default function Quiz() {
             disabled={step === 0}
             onClick={() => setStep((value) => Math.max(0, value - 1))}
           >
-            Назад
+            {tr("\u041D\u0430\u0437\u0430\u0434")}
           </button>
           <button
             className="primary-button"
             disabled={!canContinue || loading}
             onClick={next}
           >
-            {loading
-              ? "Считаю..."
-              : step === steps.length - 1
-                ? "Показать результат"
-                : "Дальше"}
+            {tr(
+              loading
+                ? "Считаю..."
+                : step === steps.length - 1
+                  ? "Показать результат"
+                  : "Дальше",
+            )}
           </button>
         </div>
       </article>
