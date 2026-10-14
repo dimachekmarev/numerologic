@@ -197,7 +197,7 @@ test("orders use server prices, deduplicate requests and reject changed payloads
   const body = { ...orderBody(), amount: 1 };
   const r = await a.call("/api/checkout/create", "POST", body),
     next = await a.call("/api/checkout/create", "POST", body);
-  assert.equal(r.value.total_amount, 490);
+  assert.equal(r.value.total_amount, 550);
   assert.equal(r.value.order_id, next.value.order_id);
   assert.equal(
     (
@@ -804,6 +804,180 @@ test("failed provider does not consume a message or save an invented conversatio
     );
   } finally {
     globalThis.fetch = original;
+    f.close();
+  }
+});
+
+test("Sites identity preserves the same account with blocked cookies and isolates another identity", async () => {
+  const f = fixture(false),
+    a = f.client(),
+    b = f.client(),
+    headers = {
+      Cookie: "",
+      "oai-authenticated-user-id": "trusted-site-user-a",
+    };
+  const first = await a.call("/api/auth/session", "POST", {}, headers);
+  assert.match(
+    first.headers.get("Set-Cookie"),
+    /SameSite=None; Secure; Partitioned/,
+  );
+  const again = await a.call("/api/auth/session", "POST", {}, headers);
+  assert.equal(again.value.id, first.value.id);
+  assert.equal(
+    (
+      await a.call(
+        "/api/quiz/complete",
+        "POST",
+        { name: "Анна", birth_date: "1995-05-02", focus: "Ясность" },
+        headers,
+      )
+    ).status,
+    200,
+  );
+  assert.equal((await a.call("/api/today", "GET", null, headers)).status, 200);
+  await a.call(
+    "/api/journal",
+    "POST",
+    { day: today(), mood: 4, text: "Persistent without cookie" },
+    headers,
+  );
+  await b.call(
+    "/api/auth/session",
+    "POST",
+    {},
+    { Cookie: "", "oai-authenticated-user-id": "trusted-site-user-b" },
+  );
+  assert.equal(
+    (
+      await b.call("/api/journal", "GET", null, {
+        Cookie: "",
+        "oai-authenticated-user-id": "trusted-site-user-b",
+      })
+    ).value.total,
+    0,
+  );
+  assert.equal(
+    (await a.call("/api/journal", "GET", null, headers)).value.total,
+    1,
+  );
+  await a.call("/api/auth/logout", "POST", {}, headers);
+  assert.equal((await a.call("/api/me", "GET", null, headers)).status, 401);
+  f.close();
+});
+test("scheduled rituals persist edits, respect days and isolate completions", async () => {
+  const f = fixture(false),
+    a = await f.client().setup(),
+    b = await f.client().setup();
+  const day = new Date(today() + "T12:00:00Z").getUTCDay();
+  const h = (
+    await a.call("/api/habits", "POST", { title: "Pause", days: [day] })
+  ).value;
+  assert.ok(h.id);
+  assert.equal(
+    (
+      await a.call("/api/habits/check", "POST", {
+        id: h.id,
+        day: today(),
+        done: true,
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (await a.call("/api/rituals")).value.habits[0].completed_total,
+    1,
+  );
+  assert.equal(
+    (
+      await b.call("/api/habits/check", "POST", {
+        id: h.id,
+        day: today(),
+        done: true,
+      })
+    ).status,
+    404,
+  );
+  assert.equal(
+    (
+      await a.call("/api/habits", "POST", {
+        id: h.id,
+        title: "New title",
+        days: [day],
+      })
+    ).value.id,
+    h.id,
+  );
+  assert.equal((await a.call("/api/rituals")).value.habits.length, 1);
+  assert.equal((await a.call("/api/monthly")).value.habit_marks, 1);
+  await a.call("/api/habits/" + h.id, "DELETE");
+  assert.deepEqual((await a.call("/api/rituals")).value.habits, []);
+  f.close();
+});
+test("30 day route opens only by entitlement; catalogue uses updated prices", async () => {
+  const f = fixture(false),
+    a = await f.client().setup("route@example.com");
+  assert.equal((await a.call("/api/products/club")).value.product.price, 1190);
+  assert.equal(
+    (await a.call("/api/products/deep-reading")).value.product.price,
+    2790,
+  );
+  assert.equal(
+    (await a.call("/api/practices/self-discovery-30")).value.days.length,
+    1,
+  );
+  await a.call("/api/trial", "POST");
+  assert.equal(
+    (await a.call("/api/practices/self-discovery-30")).value.days.length,
+    30,
+  );
+  assert.equal(
+    (
+      await a.call("/api/progress", "POST", {
+        slug: "self-discovery-30",
+        index: 29,
+        done: true,
+      })
+    ).status,
+    200,
+  );
+  f.close();
+});
+
+test("English reports switch language and exports include retention data", async () => {
+  const f = fixture(false);
+  try {
+    const c = await f.client().setup("english-reports@example.com");
+    assert.equal((await c.call("/api/trial", "POST")).status, 200);
+    const en = await c.call(
+      "/api/materials",
+      "POST",
+      { slug: "deep-reading" },
+      { "Accept-Language": "en" },
+    );
+    assert.equal(en.status, 200);
+    assert.match(en.value.content, /Seven-day plan/);
+    assert.doesNotMatch(en.value.content, /План на семь дней/);
+    const ru = await c.call("/api/reports/" + en.value.id);
+    assert.match(ru.value.content, /План на семь дней/);
+    const switched = await c.call(
+      "/api/reports/" + en.value.id,
+      "GET",
+      undefined,
+      { "Accept-Language": "en" },
+    );
+    assert.match(switched.value.content, /Seven-day plan/);
+    const pdf = await c.call("/api/reports/" + en.value.id + "/pdf?lang=en");
+    assert.equal(pdf.status, 200);
+    assert.equal(new TextDecoder().decode(pdf.value.slice(0, 5)), "%PDF-");
+    const h = await c.call("/api/habits", "POST", {
+      title: "A quiet moment",
+      days: [0, 1, 2, 3, 4, 5, 6],
+    });
+    assert.equal((await c.call("/api/habits/check", "POST", { id: h.value.id, day: today(), done: true })).status, 200);
+    const exported = await c.call("/api/export");
+    assert.equal(exported.value.habits.length, 1);
+    assert.equal(exported.value.habit_marks.length, 1);
+  } finally {
     f.close();
   }
 });

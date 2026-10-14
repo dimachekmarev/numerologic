@@ -1,18 +1,25 @@
+import { useI18n } from "../i18n";
 import { NavLink } from "react-router-dom";
+import GentleIcon from "./GentleIcon";
 const items = [
-  ["/today", "☀", "Сегодня"],
-  ["/practices", "✦", "Практики"],
-  ["/journal", "✎", "Дневник"],
-  ["/goals", "◎", "Шаги"],
-  ["/dashboard", "◉", "Кабинет"],
+  ["/today", "sun", "Сегодня", "Today"],
+  ["/practices", "flower", "Практики", "Practices"],
+  ["/journal", "journal", "Дневник", "Journal"],
+  ["/goals", "leaf", "Шаги", "Steps"],
+  ["/dashboard", "heart", "Мой уголок", "My space"],
 ];
 export default function BottomNav() {
+  const { language } = useI18n(),
+    en = language === "en";
   return (
-    <nav className="bottom-nav" aria-label="Навигация пространства">
-      {items.map(([to, icon, label]) => (
+    <nav
+      className="bottom-nav"
+      aria-label={en ? "Space navigation" : "Навигация пространства"}
+    >
+      {items.map(([to, icon, ru, english]) => (
         <NavLink key={to} to={to}>
-          <span aria-hidden="true">{icon}</span>
-          {label}
+          <GentleIcon name={icon} size={22} />
+          {en ? english : ru}
         </NavLink>
       ))}
     </nav>

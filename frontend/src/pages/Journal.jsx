@@ -1,13 +1,27 @@
+import { useI18n } from "../i18n";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useLoad, localDay } from "../hooks";
 import Status from "../components/Status";
 const moods = ["Тяжело", "Не очень", "Ровно", "Хорошо", "Отлично"];
-const blank = { text: "", mood: 3, done: false };
+const blank = {
+  text: "",
+  mood: 3,
+  done: false,
+};
 export default function Journal() {
+  const { t: tr } = useI18n();
   const [params] = useSearchParams(),
     initial = params.get("day");
+  const selectedMood = Number(params.get("mood"));
+  const initialBlank = {
+    ...blank,
+    mood:
+      Number.isInteger(selectedMood) && selectedMood >= 1 && selectedMood <= 5
+        ? selectedMood
+        : 3,
+  };
   const me = useLoad(api.me),
     [day, setDay] = useState(
       /^\d{4}-\d{2}-\d{2}$/.test(initial || "") && initial <= localDay()
@@ -28,7 +42,10 @@ export default function Journal() {
   } catch {
     /*Storage is optional.*/
   }
-  const current = edit?.key === key ? edit.data : draft || entry.data || blank;
+  const current =
+    edit?.key === key
+      ? edit.data
+      : draft || entry.data || (day === localDay() ? initialBlank : blank);
   const dirty =
     JSON.stringify({
       text: current.text,
@@ -50,7 +67,13 @@ export default function Journal() {
     }
   }, [edit, key]);
   function update(data) {
-    setEdit({ key, data: { ...current, ...data } });
+    setEdit({
+      key,
+      data: {
+        ...current,
+        ...data,
+      },
+    });
     setMessage("");
   }
   function choose(value) {
@@ -70,10 +93,16 @@ export default function Journal() {
     e.preventDefault();
     setSaving(true);
     try {
-      const saved = await api.journal({ day, ...current });
+      await api.journal({
+        day,
+        ...current,
+      });
+      void api.track("diary_saved", { source: "journal" });
       try {
         sessionStorage.removeItem(key);
-      } catch {}
+      } catch {
+        /* Storage is optional. */
+      }
       setEdit(null);
       setMessage("Запись сохранена");
       entry.reload();
@@ -91,7 +120,9 @@ export default function Journal() {
       await api.deleteJournal(date);
       try {
         sessionStorage.removeItem(`numerologic_draft:${me.data.id}:${date}`);
-      } catch {}
+      } catch {
+        /* Storage is optional. */
+      }
       if (date === day) {
         setEdit(null);
         entry.reload();
@@ -107,18 +138,33 @@ export default function Journal() {
   return (
     <section className="section">
       <div className="section-heading">
-        <span className="eyebrow">Личное, без оценок</span>
-        <h1>Как вы сегодня?</h1>
+        <span className="eyebrow">
+          {tr(
+            "\u041B\u0438\u0447\u043D\u043E\u0435, \u0431\u0435\u0437 \u043E\u0446\u0435\u043D\u043E\u043A",
+          )}
+        </span>
+        <h1>
+          {tr(
+            "\u041A\u0430\u043A \u0432\u044B \u0441\u0435\u0433\u043E\u0434\u043D\u044F?",
+          )}
+        </h1>
         <p>
-          Полная история наблюдений. Черновик остаётся в этой вкладке до
-          сохранения.
+          {tr(
+            "\u041F\u043E\u043B\u043D\u0430\u044F \u0438\u0441\u0442\u043E\u0440\u0438\u044F \u043D\u0430\u0431\u043B\u044E\u0434\u0435\u043D\u0438\u0439. \u0427\u0435\u0440\u043D\u043E\u0432\u0438\u043A \u043E\u0441\u0442\u0430\u0451\u0442\u0441\u044F \u0432 \u044D\u0442\u043E\u0439 \u0432\u043A\u043B\u0430\u0434\u043A\u0435 \u0434\u043E \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F.",
+          )}
         </p>
       </div>
       <div className="section-grid journal-layout">
         <form className="soft-card form-grid" onSubmit={save}>
-          <h2>Пауза для себя</h2>
+          <h2>
+            {tr(
+              "\u041F\u0430\u0443\u0437\u0430 \u0434\u043B\u044F \u0441\u0435\u0431\u044F",
+            )}
+          </h2>
           <label>
-            День записи
+            {tr(
+              "\u0414\u0435\u043D\u044C \u0437\u0430\u043F\u0438\u0441\u0438",
+            )}
             <input
               type="date"
               required
@@ -133,53 +179,85 @@ export default function Journal() {
           <fieldset
             disabled={saving || entry.loading || !!entry.error || !me.data}
           >
-            <legend>Настроение</legend>
+            <legend>
+              {tr(
+                "\u041D\u0430\u0441\u0442\u0440\u043E\u0435\u043D\u0438\u0435",
+              )}
+            </legend>
             <div className="mood-row">
-              {moods.map((m, i) => (
-                <button
-                  type="button"
-                  key={m}
-                  className={current.mood === i + 1 ? "selected" : ""}
-                  aria-pressed={current.mood === i + 1}
-                  onClick={() => update({ mood: i + 1 })}
-                >
-                  {["☁", "◔", "◑", "◕", "☀"][i]}
-                  <small>{m}</small>
-                </button>
-              ))}
+              {tr(
+                moods.map((m, i) => (
+                  <button
+                    type="button"
+                    key={m}
+                    className={current.mood === i + 1 ? "selected" : ""}
+                    aria-pressed={current.mood === i + 1}
+                    onClick={() =>
+                      update({
+                        mood: i + 1,
+                      })
+                    }
+                  >
+                    {tr(["☁", "◔", "◑", "◕", "☀"][i])}
+                    <small>{tr(m)}</small>
+                  </button>
+                )),
+              )}
             </div>
             <label htmlFor="journal-text">
-              Что произошло, что вы почувствовали и что помогло?
+              {tr(
+                "\u0427\u0442\u043E \u043F\u0440\u043E\u0438\u0437\u043E\u0448\u043B\u043E, \u0447\u0442\u043E \u0432\u044B \u043F\u043E\u0447\u0443\u0432\u0441\u0442\u0432\u043E\u0432\u0430\u043B\u0438 \u0438 \u0447\u0442\u043E \u043F\u043E\u043C\u043E\u0433\u043B\u043E?",
+              )}
             </label>
             <textarea
               id="journal-text"
               rows="7"
               maxLength={5000}
               value={current.text}
-              onChange={(e) => update({ text: e.target.value })}
-              placeholder="Сегодня я заметила или заметил…"
+              onChange={(e) =>
+                update({
+                  text: e.target.value,
+                })
+              }
+              placeholder={tr("Сегодня я заметила или заметил…")}
             />
             <label className="checkbox-label">
               <input
                 type="checkbox"
                 checked={current.done}
-                onChange={(e) => update({ done: e.target.checked })}
+                onChange={(e) =>
+                  update({
+                    done: e.target.checked,
+                  })
+                }
               />
-              Маленький шаг дня сделан
+              {tr(
+                "\u041C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0439 \u0448\u0430\u0433 \u0434\u043D\u044F \u0441\u0434\u0435\u043B\u0430\u043D",
+              )}
             </label>
             <button className="primary-button" disabled={!day}>
-              {saving ? "Сохраняем…" : "Сохранить запись"}
+              {tr(saving ? "Сохраняем…" : "Сохранить запись")}
             </button>
           </fieldset>
           <p role="status">
-            {message || (dirty ? "Есть несохранённый черновик" : "")}
+            {tr(message || (dirty ? "Есть несохранённый черновик" : ""))}
           </p>
-          <small>Повторное сохранение обновит запись за выбранный день.</small>
+          <small>
+            {tr(
+              "\u041F\u043E\u0432\u0442\u043E\u0440\u043D\u043E\u0435 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u0435 \u043E\u0431\u043D\u043E\u0432\u0438\u0442 \u0437\u0430\u043F\u0438\u0441\u044C \u0437\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u0434\u0435\u043D\u044C.",
+            )}
+          </small>
         </form>
         <div>
-          <h2>Ваши наблюдения</h2>
+          <h2>
+            {tr(
+              "\u0412\u0430\u0448\u0438 \u043D\u0430\u0431\u043B\u044E\u0434\u0435\u043D\u0438\u044F",
+            )}
+          </h2>
           <label className="journal-search">
-            Поиск по всей истории
+            {tr(
+              "\u041F\u043E\u0438\u0441\u043A \u043F\u043E \u0432\u0441\u0435\u0439 \u0438\u0441\u0442\u043E\u0440\u0438\u0438",
+            )}
             <input
               type="search"
               value={search}
@@ -187,67 +265,79 @@ export default function Journal() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              placeholder="Слово или дата"
+              placeholder={tr("Слово или дата")}
             />
           </label>
           <Status {...history} />
           <div className="entry-list">
-            {history.data?.entries.map((e) => (
-              <article className="soft-card" key={e.id}>
-                <span className="chip">
-                  {e.day} · {moods[e.mood - 1]}
-                </span>
-                <p className="entry-text">{e.text || "Без текста"}</p>
-                <small>{e.done ? "✓ Шаг сделан" : "В своём темпе"}</small>
-                <div className="hero-actions">
-                  <button
-                    className="ghost-button"
-                    onClick={() => {
-                      choose(e.day);
-                      document.getElementById("journal-text")?.focus();
-                    }}
-                    disabled={saving}
-                  >
-                    Редактировать
-                  </button>
-                  <button
-                    className="ghost-button"
-                    onClick={() => remove(e.day)}
-                    disabled={saving}
-                  >
-                    Удалить
-                  </button>
-                </div>
-              </article>
-            ))}
+            {tr(
+              history.data?.entries.map((e) => (
+                <article className="soft-card" key={e.id}>
+                  <span className="chip">
+                    {tr(e.day)} · {tr(moods[e.mood - 1])}
+                  </span>
+                  <p className="entry-text">{tr(e.text || "Без текста")}</p>
+                  <small>{tr(e.done ? "✓ Шаг сделан" : "В своём темпе")}</small>
+                  <div className="hero-actions">
+                    <button
+                      className="ghost-button"
+                      onClick={() => {
+                        choose(e.day);
+                        document.getElementById("journal-text")?.focus();
+                      }}
+                      disabled={saving}
+                    >
+                      {tr(
+                        "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
+                      )}
+                    </button>
+                    <button
+                      className="ghost-button"
+                      onClick={() => remove(e.day)}
+                      disabled={saving}
+                    >
+                      {tr("\u0423\u0434\u0430\u043B\u0438\u0442\u044C")}
+                    </button>
+                  </div>
+                </article>
+              )),
+            )}
           </div>
-          {history.data && !history.data.entries.length && (
-            <p>
-              {search
-                ? "Совпадений нет. Попробуйте другое слово."
-                : "Здесь появится ваша первая запись."}
-            </p>
+          {tr(
+            history.data && !history.data.entries.length && (
+              <p>
+                {tr(
+                  search
+                    ? "Совпадений нет. Попробуйте другое слово."
+                    : "Здесь появится ваша первая запись.",
+                )}
+              </p>
+            ),
           )}
-          {history.data && (
-            <div className="pagination">
-              <button
-                className="secondary-button"
-                disabled={page <= 1 || history.loading}
-                onClick={() => setPage((x) => x - 1)}
-              >
-                ← Назад
-              </button>
-              <span>
-                {page} / {history.data.pages} · {history.data.total} записей
-              </span>
-              <button
-                className="secondary-button"
-                disabled={page >= history.data.pages || history.loading}
-                onClick={() => setPage((x) => x + 1)}
-              >
-                Далее →
-              </button>
-            </div>
+          {tr(
+            history.data && (
+              <div className="pagination">
+                <button
+                  className="secondary-button"
+                  disabled={page <= 1 || history.loading}
+                  onClick={() => setPage((x) => x - 1)}
+                >
+                  {tr("\u2190 \u041D\u0430\u0437\u0430\u0434")}
+                </button>
+                <span>
+                  {tr(page)} / {tr(history.data.pages)} ·{" "}
+                  {tr(history.data.total)}
+                  {tr("\u0437\u0430\u043F\u0438\u0441\u0435\u0439")}
+                </span>
+                <button
+                  className="secondary-button"
+                  disabled={page >= history.data.pages || history.loading}
+                  onClick={() => setPage((x) => x + 1)}
+                >
+                  {tr("\u0414\u0430\u043B\u0435\u0435 \u2192")}
+                </button>
+              </div>
+            ),
           )}
         </div>
       </div>

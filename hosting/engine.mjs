@@ -1,5 +1,6 @@
 import symbolic from "./symbolic.json" with { type: "json" };
 import library from "../backend/library.json" with { type: "json" };
+import { localizeContent } from "./translations.mjs";
 import {
   meanings,
   calculateProfile,
@@ -7,6 +8,7 @@ import {
 } from "../shared/numerology.mjs";
 export { library };
 export { meanings };
+export { localizeContent };
 export const { practices, tarot } = symbolic;
 export const today = () =>
   new Intl.DateTimeFormat("en-CA", {
@@ -101,9 +103,10 @@ export async function daily(user, d = today()) {
     profile: p,
   };
 }
-export function reportContent(customer, slug, partner = null) {
+export function reportContent(customer, slug, partner = null, language = "ru") {
   const { name, birth_date: b, focus } = customer,
     p = profile(name, b);
+  if (language === "en") return englishReport(customer, slug, partner, p);
   if (library[slug])
     return [
       `NUMEROLOGIC · Практикум для ${name}`,
@@ -157,8 +160,21 @@ export function reportContent(customer, slug, partner = null) {
   return parts.join("\n\n");
 }
 
-export function mapContent(user) {
+export function mapContent(user, language = "ru") {
   const p = profile(user.name, user.birth_date);
+  if (language === "en") {
+    const meaning = (number) => localizeContent(meanings[number], "en");
+    return [
+      `NUMEROLOGIC · Numerology chart for ${user.name}`,
+      `Method\n${localizeContent(p.system, "en")}`,
+      `Birth-date calculation\n${p.arithmetic}`,
+      `Life path: ${p.life_path} — ${meaning(p.life_path)}`,
+      `Name number: ${p.destiny} — ${meaning(p.destiny)}\nInner priorities: ${p.soul} — ${meaning(p.soul)}\nOutward expression: ${p.personality} — ${meaning(p.personality)}\nBirth day: ${p.birthday} — ${meaning(p.birthday)}`,
+      `Personal year: ${p.year} — ${meaning(p.year)}\nPersonal month: ${p.month} — ${meaning(p.month)}`,
+      "Reflection prompt\nWhich of these themes resonates with you right now? Write down one example from your life and one small next step.",
+      "These symbolic themes offer prompts for self-reflection. They do not describe your character or predict events. Full themed reports and guided courses are available separately.",
+    ].join("\n\n");
+  }
   return [
     `NUMEROLOGIC · Карта чисел для ${user.name}`,
     `Метод\n${p.system}`,
@@ -169,4 +185,63 @@ export function mapContent(user) {
     `Вопрос для наблюдения\nКакая из этих тем отзывается сейчас? Запишите один пример из своей жизни и один небольшой шаг.`,
     `Это символические темы для саморефлексии, а не описание характера или предсказание. Полные тематические материалы и практикумы доступны отдельно.`,
   ].join("\n\n");
+}
+
+function englishReport(customer, slug, partner, p) {
+  const { name, focus } = customer;
+  const translate = (value) => localizeContent(value, "en");
+  const meaning = (number) => translate(meanings[number]);
+  const practice = (number) => translate(practices[number]);
+  if (library[slug])
+    return [
+      `NUMEROLOGIC · Guided course for ${name}`,
+      "Self-guided exercises for self-observation. These exercises do not provide psychotherapy. Choose safe situations and a pace that suits you.",
+      ...library[slug].map(
+        (entry, index) =>
+          `Day ${index + 1}. ${translate(entry[0])}\n${translate(entry[1])}\nJournal prompt: ${translate(entry[2])}`,
+      ),
+      "Track your progress in Practices. You can repeat exercises and take breaks.",
+    ].join("\n\n");
+  const parts = [
+    `NUMEROLOGIC · ${name}`,
+    `Focus: ${focus ? translate(focus) : "self-observation"}`,
+    `Method\n${translate(p.system)}\nBirth date: ${p.arithmetic}`,
+    `Numerology chart\nLife path: ${p.life_path} — ${meaning(p.life_path)}.\nName: ${p.destiny}. Vowels: ${p.soul}. Consonants: ${p.personality}.\nThese themes offer questions for reflection. They make no claims about your personality.`,
+  ];
+  if (["compatibility", "love-scenario", "deep-reading"].includes(slug)) {
+    let section =
+      "Relationships\nName one need each. Agree on a time to talk without phones. Note which boundaries help you feel comfortable.\nQuestions: What am I expecting without saying it? What can I ask for directly? How will we know our agreement is working?";
+    if (partner) {
+      const q = profile(partner.name, partner.birth_date);
+      section += `\nPartner’s chart: ${partner.name}, life path ${q.life_path} (${meaning(q.life_path)}). Shared theme: ${meaning(reduce(p.life_path + q.life_path))}.\nPartner’s calculation: ${q.arithmetic}. Numbers do not measure the quality of a relationship.`;
+    }
+    parts.push(section);
+  }
+  if (["money-realization", "deep-reading"].includes(slug))
+    parts.push(
+      "Work and resources\nSeparate tasks you control from external circumstances. Write down three skills and one specific example of using them. Choose a step you can verify, such as having a conversation, writing a draft, or completing a task.\nQuestions: What takes up my time? What help can I ask for? Numbers are not used to guide investments, set prices, or predict income.",
+    );
+  if (["life-period", "year-forecast", "deep-reading", "club"].includes(slug))
+    parts.push(
+      `Theme calendar\nPersonal year: ${p.year}\n` +
+        (slug === "year-forecast"
+          ? Array.from({ length: 12 }, (_, index) => index + 1)
+          : [Number(today().slice(5, 7))]
+        )
+          .map((month) => {
+            const number = reduce(p.year + month);
+            return `Month ${month}: ${meaning(number)}. ${practice(number)}`;
+          })
+          .join("\n") +
+        "\nDates do not indicate luck or risk. Plan around your actual circumstances.",
+    );
+  parts.push(
+    "Seven-day plan\n" +
+      Array.from(
+        { length: 7 },
+        (_, index) => `${index + 1}. ${practice(reduce(p.life_path + index))}`,
+      ).join("\n"),
+    "Weekly reflection\nWhat worked? What did I learn? Which step would I like to repeat? Save your answers in your journal.\nThis service is for entertainment and self-reflection. It does not predict events or replace professional advice.",
+  );
+  return parts.join("\n\n");
 }

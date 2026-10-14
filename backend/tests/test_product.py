@@ -138,7 +138,7 @@ def test_price_is_from_server_and_no_unimplemented_addons(client):
         "amount": 1,
     }
     r = client.post("/api/checkout/create", json=body)
-    assert r.json()["total_amount"] == 1000
+    assert r.json()["total_amount"] == 1190
     body["addons"] = ["audio"]
     r = client.post("/api/checkout/create", json=body)
     assert r.status_code == 422
@@ -284,7 +284,7 @@ def test_provider_success_checks_amount_and_current_status(client, monkeypatch):
         lambda *a, **k: {
             "id": f"test-{oid}",
             "metadata": {"order_id": str(oid)},
-            "amount": {"value": "2490.00", "currency": "RUB"},
+            "amount": {"value": "2790.00", "currency": "RUB"},
             "status": "pending",
             "paid": False,
         },
@@ -296,7 +296,7 @@ def test_provider_success_checks_amount_and_current_status(client, monkeypatch):
         lambda *a, **k: {
             "id": f"test-{oid}",
             "metadata": {"order_id": str(oid)},
-            "amount": {"value": "2490.00", "currency": "RUB"},
+            "amount": {"value": "2790.00", "currency": "RUB"},
             "status": "succeeded",
             "paid": True,
         },
@@ -317,7 +317,7 @@ def test_yandex_captured_is_bound_to_merchant_and_amount(client, monkeypatch):
     response = {
         "orderId": f"test-{oid}",
         "merchantId": "shop-1",
-        "orderAmount": "2490.00",
+        "orderAmount": "2790.00",
         "currencyCode": "RUB",
         "paymentStatus": "AUTHORIZED",
     }
@@ -326,7 +326,7 @@ def test_yandex_captured_is_bound_to_merchant_and_amount(client, monkeypatch):
     response["orderAmount"] = "1.00"
     response["paymentStatus"] = "CAPTURED"
     assert client.get(f"/api/orders/{oid}").status_code == 400
-    response["orderAmount"] = "2490.00"
+    response["orderAmount"] = "2790.00"
     response["merchantId"] = "other"
     assert client.get(f"/api/orders/{oid}").status_code == 400
     response["merchantId"] = "shop-1"

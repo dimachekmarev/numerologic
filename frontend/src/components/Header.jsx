@@ -1,26 +1,73 @@
-import { Link, NavLink } from "react-router-dom";
+import BrandMark from "./BrandMark";
+import LanguageSwitch from "./LanguageSwitch";
+import { useI18n } from "../i18n";
+import { Link, NavLink, useLocation } from "react-router-dom";
 export default function Header() {
+  const { language } = useI18n();
+  const en = language === "en",
+    home = ["/", "/landing-a", "/landing-b"].includes(useLocation().pathname);
+  const links = home
+    ? [
+        ["/numbers", "Личная карта", "Your chart"],
+        ["/practices", "Практики", "Practices"],
+        ["/journal", "Дневник", "Journal"],
+      ]
+    : [
+        ["/today", "Сегодня", "Today"],
+        ["/numbers", "Моя карта", "My chart"],
+        ["/practices", "Практики", "Practices"],
+        ["/journal", "Дневник", "Journal"],
+        ["/goals", "Шаги", "Steps"],
+      ];
   return (
     <header className="site-header">
-      <Link to="/" className="brand" aria-label="Numerologic — главная">
-        <span className="brand-mark">
-          N<span>✦</span>
-        </span>
+      <Link
+        to="/"
+        className="brand"
+        aria-label={en ? "Numerologic home" : "Numerologic — главная"}
+      >
+        <BrandMark decorative />
         <span>
-          numerologic<span className="brand-caption">your inner space</span>
+          numerologic
+          <span className="brand-caption">
+            {en ? "a little closer to yourself" : "немного ближе к себе"}
+          </span>
         </span>
       </Link>
-      <nav className="desktop-nav" aria-label="Основная навигация">
-        <NavLink to="/today">Сегодня</NavLink>
-        <NavLink to="/numbers">Карта</NavLink>
-        <NavLink to="/practices">Практики</NavLink>
-        <NavLink to="/journal">Дневник</NavLink>
-        <NavLink to="/calendar">Календарь</NavLink>
-        <NavLink to="/goals">Цели</NavLink>
-        <NavLink to="/assistant">Помощник</NavLink>
+      <nav
+        className="desktop-nav"
+        aria-label={en ? "Main navigation" : "Основная навигация"}
+      >
+        {links.map(([to, ru, english]) => (
+          <NavLink key={to} to={to}>
+            {en ? english : ru}
+          </NavLink>
+        ))}
+        {!home && (
+          <details className="header-more">
+            <summary>{en ? "More" : "Ещё"}</summary>
+            <nav>
+              {[
+                ["/calendar", "Календарь", "Calendar"],
+                ["/rituals", "Ритуалы", "Rituals"],
+                ["/weekly", "Моя неделя", "My week"],
+                ["/compatibility", "Отношения", "Relationships"],
+                ["/assistant", "Помощник", "Assistant"],
+                ["/products", "Материалы", "Materials"],
+                ["/club", "Клуб", "Club"],
+              ].map(([to, ru, english]) => (
+                <Link key={to} to={to}>
+                  {en ? english : ru}
+                </Link>
+              ))}
+            </nav>
+          </details>
+        )}
       </nav>
-      <Link className="ghost-button" to="/dashboard">
-        Мой кабинет ↗
+      <LanguageSwitch />
+      <Link className="header-account" to="/dashboard">
+        {en ? "My space" : "Мой уголок"}
+        <span aria-hidden="true">↗</span>
       </Link>
     </header>
   );

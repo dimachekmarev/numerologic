@@ -1,10 +1,14 @@
+import { useI18n } from "../i18n";
 import { useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
+import BrandMark from "./BrandMark";
 import { api } from "../api";
 import { useLoad } from "../hooks";
 import BottomNav from "./BottomNav";
 export default function Layout() {
+  const { language } = useI18n(),
+    en = language === "en";
   const { pathname } = useLocation();
   const config = useLoad(api.config);
   useEffect(() => {
@@ -14,7 +18,9 @@ export default function Layout() {
     <div className="app-shell">
       {config.data?.test_mode && (
         <div className="demo-banner" role="status">
-          Демонстрационная версия · покупки тестовые, деньги не списываются
+          {en
+            ? "Demo · purchases are simulated, no money is charged"
+            : "Демонстрационная версия · покупки тестовые, деньги не списываются"}
         </div>
       )}
       <Header />
@@ -22,21 +28,54 @@ export default function Layout() {
         <Outlet />
       </main>
       <footer className="site-footer">
-        <p>Numerologic · пространство саморефлексии</p>
-        <nav>
-          <Link to="/numbers">Моя карта</Link>
-          <Link to="/weekly">Моя неделя</Link>
-          <Link to="/assistant">Помощник</Link>
-          <Link to="/compatibility">Совместимость</Link>
-          <Link to="/products">Материалы</Link>
-          <Link to="/club">Клуб</Link>
-          <Link to="/faq">Вопросы</Link>
-          <Link to="/terms">Условия</Link>
-          <Link to="/privacy">Приватность</Link>
-        </nav>
-        <small>
-          Символы помогают задать вопрос. Ответы и решения остаются вашими.
-        </small>
+        <div className="cozy-footer-grid">
+          <div>
+            <Link to="/" className="brand">
+              <BrandMark decorative size={32} />
+              <span>numerologic</span>
+            </Link>
+            <p>
+              {en
+                ? "A place for your thoughts, discoveries and small everyday rituals. A little closer to yourself."
+                : "Место для ваших мыслей, открытий и маленьких ежедневных ритуалов. Немного ближе к себе."}
+            </p>
+          </div>
+          <nav aria-label={en ? "Your space" : "Ваше пространство"}>
+            <strong>{en ? "Your space" : "Ваше пространство"}</strong>
+            {[
+              ["/numbers", "Моя карта", "My chart"],
+              ["/journal", "Дневник", "Journal"],
+              ["/rituals", "Мои ритуалы", "My rituals"],
+              ["/practices", "Практики", "Practices"],
+              ["/club", "Клуб", "Club"],
+            ].map(([to, ru, english]) => (
+              <Link key={to} to={to}>
+                {en ? english : ru}
+              </Link>
+            ))}
+          </nav>
+          <nav aria-label={en ? "About Numerologic" : "О Numerologic"}>
+            <strong>{en ? "A little more" : "Чуть больше"}</strong>
+            {[
+              ["/faq", "Частые вопросы", "Common questions"],
+              ["/account", "Мой аккаунт", "My account"],
+              ["/terms", "Условия", "Terms"],
+              ["/privacy", "Приватность", "Privacy"],
+            ].map(([to, ru, english]) => (
+              <Link key={to} to={to}>
+                {en ? english : ru}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <div className="cozy-footer-bottom">
+          <span>© {new Date().getFullYear()} Numerologic</span>
+          <span>
+            {en
+              ? "Your thoughts. Your pace. Your decisions."
+              : "Ваши мысли. Ваш темп. Ваши решения."}
+          </span>
+        </div>
       </footer>
       <BottomNav />
     </div>

@@ -4,8 +4,10 @@ export async function request(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     credentials: "include",
+    signal: options.signal || AbortSignal.timeout(20000),
     headers: {
       "Content-Type": "application/json",
+      "Accept-Language": localStorage.getItem("numerologic_language") || "ru",
       "X-Numerologic-Client": "web",
       ...(options.headers || {}),
     },
@@ -41,7 +43,11 @@ async function secured(path, options) {
   try {
     return await request(path, options);
   } catch (error) {
-    if (error.status === 401) sessionPromise = null;
+    if (error.status === 401) {
+      sessionPromise = null;
+      await ensureSession();
+      return request(path, options);
+    }
     throw error;
   }
 }
@@ -49,6 +55,13 @@ function securePost(path, data) {
   return secured(path, { method: "POST", body: JSON.stringify(data) });
 }
 export const api = {
+  rituals: () => secured("/api/rituals"),
+  habit: (data) => securePost("/api/habits", data),
+  habitMark: (data) => securePost("/api/habits/check", data),
+  deleteHabit: (id) => secured(`/api/habits/${id}`, { method: "DELETE" }),
+  monthly: (month) => secured(`/api/monthly?month=${month}`),
+  marketing: () => request("/api/marketing/campaigns"),
+  myEvents: () => secured("/api/marketing/metrics"),
   trial: () => securePost("/api/trial", {}),
   material: (slug, partner) => securePost("/api/materials", { slug, partner }),
   weekly: () => secured("/api/weekly"),
@@ -86,7 +99,8 @@ export const api = {
     post("/api/auth/login", data).then((result) => {
       sessionPromise = Promise.resolve(result);
       for (const key of Object.keys(localStorage))
-        if (key.startsWith("numerologic_")) localStorage.removeItem(key);
+        if (key.startsWith("numerologic_") && key !== "numerologic_language")
+          localStorage.removeItem(key);
       for (const key of Object.keys(sessionStorage))
         if (key.startsWith("numerologic_")) sessionStorage.removeItem(key);
       return result;
@@ -118,7 +132,37 @@ export const api = {
   calendar: (month) => secured(`/api/calendar?month=${month}`),
   track: async (event, properties = {}) => {
     try {
-      await securePost("/api/events", { event, properties });
+      let attribution = {};
+      try {
+        const params = new URLSearchParams(window.location.search);
+        for (const k of [
+          "utm_source",
+          "utm_medium",
+          "utm_campaign",
+          "utm_content",
+          "ref",
+        ])
+          if (params.get(k)) attribution[k] = params.get(k).slice(0, 100);
+        if (Object.keys(attribution).length)
+          sessionStorage.setItem(
+            "numerologic_attribution",
+            JSON.stringify(attribution),
+          );
+        else
+          attribution = JSON.parse(
+            sessionStorage.getItem("numerologic_attribution") || "{}",
+          );
+      } catch {
+        // Optional attribution must not block the request.
+      }
+      await securePost("/api/events", {
+        event,
+        properties: {
+          ...attribution,
+          locale: localStorage.getItem("numerologic_language") || "ru",
+          ...properties,
+        },
+      });
     } catch {
       /* Analytics never blocks the product. */
     }

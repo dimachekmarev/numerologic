@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
+import { useI18n } from "./i18n";
 export function useLoad(loader, deps = []) {
+  const { language } = useI18n();
   const [state, setState] = useState({ loading: true, data: null, error: "" });
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     let alive = true;
-    setState({ loading: true, data: null, error: "" });
-    loader()
+    Promise.resolve()
+      .then(() => {
+        if (!alive) return;
+        setState({ loading: true, data: null, error: "" });
+        return loader();
+      })
       .then((data) => {
         if (alive) setState({ loading: false, data, error: "" });
       })
@@ -18,7 +24,7 @@ export function useLoad(loader, deps = []) {
     };
     // Callers pass stable API functions; explicit deps identify load parameters.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [...deps, revision]);
+  }, [...deps, revision, language]);
   return { ...state, reload: () => setRevision((x) => x + 1) };
 }
 export function stored(key, fallback = null) {
