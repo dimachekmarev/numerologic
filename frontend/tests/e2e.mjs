@@ -68,6 +68,29 @@ await page.screenshot({
   path: "../docs/screenshots/today-desktop.png",
   fullPage: true,
 });
+// Exercise the new bilingual and retention flows against the Worker.
+await page.goto(base + "/rituals");
+await page.getByPlaceholder("Записать одну мысль, сделать тихую паузу…").fill("Пять минут тишины");
+await page.getByRole("button", { name: "Добавить ритуал", exact: true }).click();
+const ritual = page.locator(".habit-card").filter({ hasText: "Пять минут тишины" });
+await ritual.getByRole("button", { name: "Отметить выполнение", exact: true }).click();
+await ritual.getByText(/1 выполнено/).waitFor();
+await page.reload();
+await ritual.getByText(/1 выполнено/).waitFor();
+await page.getByRole("button", { name: "EN", exact: true }).click();
+await page.getByRole("heading", { name: "Small rituals. A place to return.", exact: true }).waitFor();
+await page.reload();
+assert.equal(await page.locator("html").getAttribute("lang"), "en");
+page.once("dialog", (dialog) => dialog.accept());
+await ritual.getByRole("button", { name: "Delete", exact: true }).click();
+await page.getByRole("heading", { name: "Пять минут тишины", exact: true }).waitFor({ state: "hidden" });
+for (const route of ["/landing-a", "/landing-b"]) {
+  await page.goto(base + route + "?lang=en");
+  await page.getByLabel("Date of birth", { exact: true }).fill("1995-08-01");
+  await page.locator(".nl-result-number").filter({ hasText: "33" }).waitFor();
+  await page.screenshot({ path: "../docs/screenshots/" + route.slice(1) + "-en.png", fullPage: true });
+}
+await page.getByRole("button", { name: "RU", exact: true }).click();
 const mobile = await context.newPage();
 await mobile.setViewportSize({ width: 390, height: 844 });
 for (const route of [
@@ -85,6 +108,10 @@ for (const route of [
   "/checkout?product=club",
   "/account",
   "/assistant",
+  "/rituals",
+  "/landing-a",
+  "/landing-b",
+  "/marketing",
 ]) {
   await mobile.goto(base + route);
   await mobile.locator("h1").waitFor();
@@ -104,12 +131,12 @@ assert.deepEqual(errors, []);
 fs.writeFileSync(
   "../docs/e2e-result.json",
   JSON.stringify(
-    { full_flow: "passed", mobile_routes: 14, browser_errors: errors },
+    { full_flow: "passed", mobile_routes: 18, browser_errors: errors },
     null,
     2,
   ),
 );
 console.log(
-  "PASS: quiz → account → journal → goal → trial → report → unlocked practice; 14 mobile routes, no overflow or browser exceptions",
+  "PASS: quiz → account → journal → goal → trial → report → unlocked practice; 18 mobile routes, no overflow or browser exceptions",
 );
 await browser.close();
