@@ -26,7 +26,6 @@ import Numbers from "./pages/Numbers";
 import Weekly from "./pages/Weekly";
 import "./App.css";
 import "./brand.css";
-import Landing from "./pages/Landing";
 import Rituals from "./pages/Rituals";
 import Marketing from "./pages/Marketing";
 
@@ -48,10 +47,10 @@ export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
-        <Route path="landing-a" element={<Landing variant="a" />} />
-        <Route path="landing-b" element={<Landing variant="b" />} />
         <Route element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="landing-a" element={<Home variant="a" />} />
+          <Route path="landing-b" element={<Home variant="b" />} />
           <Route path="today" element={<Today />} />
           <Route path="rituals" element={<Rituals />} />
           <Route path="marketing" element={<Marketing />} />

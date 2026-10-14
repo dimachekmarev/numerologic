@@ -1,6 +1,6 @@
 import { useI18n } from "../i18n";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { localDay } from "../hooks";
 const focusOptions = [
@@ -18,12 +18,20 @@ const relationshipOptions = [
 export default function Quiz() {
   const { t: tr } = useI18n();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const birth = params.get("birth_date") || "";
+  const prefilledBirth =
+    /^\d{4}-\d{2}-\d{2}$/.test(birth) &&
+    birth >= "1900-01-01" &&
+    birth <= localDay()
+      ? birth
+      : "";
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "",
-    birth_date: "",
+    birth_date: prefilledBirth,
     focus: "Ясность",
     relationship_status: "сложно ответить",
     question: "",
@@ -35,7 +43,7 @@ export default function Quiz() {
         title: "Как к вам обращаться?",
         field: "name",
         type: "text",
-        placeholder: "Например, Дмитрий",
+        placeholder: "Например, Анна",
       },
       {
         title: "Дата рождения",

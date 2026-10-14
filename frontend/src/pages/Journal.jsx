@@ -14,6 +14,14 @@ export default function Journal() {
   const { t: tr } = useI18n();
   const [params] = useSearchParams(),
     initial = params.get("day");
+  const selectedMood = Number(params.get("mood"));
+  const initialBlank = {
+    ...blank,
+    mood:
+      Number.isInteger(selectedMood) && selectedMood >= 1 && selectedMood <= 5
+        ? selectedMood
+        : 3,
+  };
   const me = useLoad(api.me),
     [day, setDay] = useState(
       /^\d{4}-\d{2}-\d{2}$/.test(initial || "") && initial <= localDay()
@@ -34,7 +42,10 @@ export default function Journal() {
   } catch {
     /*Storage is optional.*/
   }
-  const current = edit?.key === key ? edit.data : draft || entry.data || blank;
+  const current =
+    edit?.key === key
+      ? edit.data
+      : draft || entry.data || (day === localDay() ? initialBlank : blank);
   const dirty =
     JSON.stringify({
       text: current.text,

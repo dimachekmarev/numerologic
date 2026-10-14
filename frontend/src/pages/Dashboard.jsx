@@ -6,7 +6,8 @@ import Status from "../components/Status";
 import ReportCard from "../components/ReportCard";
 import TrialAccess from "../components/TrialAccess";
 export default function Dashboard() {
-  const { t: tr } = useI18n();
+  const { t: tr, language } = useI18n();
+  const en = language === "en";
   const state = useLoad(api.dashboard),
     week = useLoad(api.weekly);
   if (!state.data)
@@ -19,31 +20,44 @@ export default function Dashboard() {
     p = d.user.profile;
   return (
     <section className="section">
-      <div className="section-heading split">
-        <div>
-          <span className="eyebrow">
-            {tr(
-              "\u0412\u0430\u0448\u0435 \u043B\u0438\u0447\u043D\u043E\u0435 \u043F\u0440\u043E\u0441\u0442\u0440\u0430\u043D\u0441\u0442\u0432\u043E",
-            )}
+      <div className="cozy-dashboard">
+        <div className="cozy-dashboard-copy">
+          <span className="cozy-eyebrow">
+            {new Date().toLocaleDateString(en ? "en-US" : "ru-RU", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+            })}
           </span>
           <h1>
-            {tr(
-              d.user.name === "Гость"
-                ? "Начните с себя."
-                : `${d.user.name}, добро пожаловать.`,
-            )}
+            {d.user.name === "Гость"
+              ? en
+                ? "Make yourself at home."
+                : "Побудьте немного с собой."
+              : en
+                ? `A little time for you, ${d.user.name}.`
+                : `${d.user.name}, это время для вас.`}
           </h1>
           <p>
-            {tr(
-              "\u041A\u0430\u0440\u0442\u0430, \u043C\u044B\u0441\u043B\u0438 \u0438 \u043C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0435 \u0448\u0430\u0433\u0438 \u2014 \u0432\u0441\u0451 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0435\u0442\u0441\u044F \u0437\u0434\u0435\u0441\u044C.",
-            )}
+            {en
+              ? "No need to rush. Choose one thought, one gentle practice or one small step for today."
+              : "Можно без спешки. Выберите одну мысль, одну бережную практику или один маленький шаг на сегодня."}
           </p>
+          <Link className="cozy-text-link" to="/journal">
+            {en
+              ? "How are you feeling today?"
+              : "Как вы сегодня себя чувствуете?"}{" "}
+            <span aria-hidden="true">↗</span>
+          </Link>
         </div>
-        <Link className="secondary-button" to="/account">
-          {tr(
-            "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 \u0430\u043A\u043A\u0430\u0443\u043D\u0442\u0430 \u2197",
-          )}
-        </Link>
+        <div className="cozy-dashboard-image">
+          <img
+            src={`${import.meta.env.BASE_URL}quiet-morning.webp`}
+            alt=""
+            width="1122"
+            height="1402"
+          />
+        </div>
       </div>
       {tr(
         (!p || !d.user.registered) && (
