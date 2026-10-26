@@ -3005,3 +3005,224 @@ legend {
 .faq-cta-card .hero-actions {
   justify-content: center;
 }
+
+/* ==================== */
+/* PRODUCT CARD V2 */
+/* ==================== */
+.product-card-v2 {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.product-card-v2 .product-card {
+  height: 100%;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+.product-card-v2:hover .product-card {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(101, 80, 116, 0.15);
+}
+.card-price {
+  font-family: Georgia, serif;
+  font-size: 1.1rem;
+  color: var(--plum);
+}
+.card-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.card-cta {
+  color: var(--berry);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.product-card-v2:hover .card-cta {
+  color: var(--plum);
+}
+
+/* ==================== */
+/* TODAY PAGE */
+/* ==================== */
+.today-hero {
+  margin-bottom: 40px;
+}
+.today-hero-content {
+  display: grid;
+  gap: 16px;
+}
+.today-lead {
+  font-size: 1.1rem;
+  max-width: 600px;
+}
+.today-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.today-main-card {
+  background: linear-gradient(135deg, #ece6f1, #f8f6fa);
+}
+.daily-practice {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--plum);
+  margin: 12px 0 20px;
+}
+.daily-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.today-tarot {
+  position: relative;
+  overflow: hidden;
+}
+.tarot-question {
+  font-family: Georgia, serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--plum);
+  line-height: 1.6;
+}
+.today-insight {
+  margin-top: 30px;
+}
+.insight-actions {
+  display: grid;
+  gap: 16px;
+  margin-top: 8px;
+}
+.ai-unavailable {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: #f8f6fa;
+  border-radius: 14px;
+}
+.ai-unavailable p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+.insight-result {
+  margin-top: 20px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f0eafa, #f0f5ef);
+  border-radius: 18px;
+  display: grid;
+  gap: 16px;
+}
+.insight-icon {
+  font-size: 2rem;
+}
+.insight-result .entry-text {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--plum);
+}
+.today-quick-heading {
+  margin-top: 50px;
+  margin-bottom: 10px;
+}
+.today-quick-grid {
+  margin-top: 20px;
+}
+.today-quick-card {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s;
+}
+.today-quick-card:hover {
+  transform: translateY(-4px);
+}
+.quick-icon {
+  font-size: 2.5rem;
+}
+.quick-cta {
+  color: var(--berry);
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+.today-retention {
+  margin-top: 50px;
+}
+.retention-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  background: linear-gradient(135deg, #edf0e9, #f8f6fa);
+  border: none;
+  padding: 40px;
+}
+.retention-content {
+  display: grid;
+  gap: 12px;
+}
+.retention-content h3 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .retention-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 30px 24px;
+  }
+  .daily-actions {
+    flex-direction: column;
+  }
+  .daily-actions .primary-button,
+  .daily-actions .secondary-button {
+    width: 100%;
+  }
+}
+
+/* ==================== */
+/* SMOOTH SCROLL */
+/* ==================== */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ==================== */
+/* FADE IN ANIMATION */
+/* ==================== */
+.hero-copy,
+.hero-art,
+.social-proof-bar,
+.pain-grid,
+.steps-flow,
+.features-bento,
+.testimonials-grid,
+.pricing-table,
+.guarantee-card,
+.club-banner,
+.faq-grid,
+.final-cta-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== */
+/* SELECTION STYLE */
+/* ==================== */
+::selection {
+  background: #e9e0ee;
+  color: var(--plum);
+}
