@@ -4,7 +4,8 @@ import { resolve } from "node:path";
 import worker from "../dist/server/index.js";
 import { localDatabase } from "./local-db.mjs";
 const port = Number(process.env.PORT || 8080),
-  origin = `http://127.0.0.1:${port}`,
+  host = process.env.HOST || "127.0.0.1",
+  origin = process.env.APP_ORIGIN || `http://${host === "0.0.0.0" ? "localhost" : host}:${port}`,
   root = resolve("dist/client");
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -59,6 +60,6 @@ createServer(async (req, res) => {
     res.writeHead(500);
     res.end("Local preview error");
   }
-}).listen(port, "127.0.0.1", () =>
+}).listen(port, process.env.HOST || "127.0.0.1", () =>
   console.log("Numerologic local QA: " + origin),
 );

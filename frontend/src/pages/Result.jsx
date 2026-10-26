@@ -29,58 +29,113 @@ export default function Result() {
   }
 
   return (
-    <section className="result-page section-grid">
-      <div className="soft-card result-summary">
-        <span className="chip">Бесплатный мини-разбор</span>
-        <h1>{mini.headline}</h1>
-        <p className="lead">{mini.summary}</p>
-        <div className="numbers-row">
-          <div>
-            <strong>{stored.profile.life_path}</strong>
-            <span>путь</span>
-          </div>
-          <div>
-            <strong>{stored.profile.destiny}</strong>
-            <span>имя</span>
-          </div>
-          <div>
-            <strong>{stored.profile.month}</strong>
-            <span>месяц</span>
-          </div>
-        </div>
-        <p className="small-note">{stored.profile.arithmetic}</p>
-        <div className="hero-actions">
-          <Link className="primary-button" to="/numbers">
-            Полная карта чисел ↗
-          </Link>
-          <Link className="secondary-button" to="/today">
-            Моя тема дня
-          </Link>
-        </div>
-        <p>
-          Фокус запроса: <b>{quiz?.focus || mini.focus}</b>
-        </p>
+    <section className="result-page section">
+      {/* CELEBRATION */}
+      <div className="result-celebration">
+        <span className="celebration-icon">✦</span>
+        <h1>Ваш ритм найден</h1>
+        <p>{mini.headline}</p>
       </div>
-      <div className="soft-card locked-card">
-        <span className="eyebrow">Полный отчёт</span>
-        <h2>Внутри ещё 4 закрытые секции</h2>
-        {miniReportSections.map((section) => (
-          <div key={section.title} className="mini-section">
-            <h3>{section.title}</h3>
-            <ul className="feature-list">
-              {section.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+
+      <div className="result-grid">
+        {/* LEFT: FREE RESULT */}
+        <div className="soft-card result-summary">
+          <span className="chip sage">✓ Бесплатный результат</span>
+          <h2>{mini.summary}</h2>
+          <div className="numbers-row">
+            <div>
+              <strong>{stored.profile.life_path}</strong>
+              <span>путь</span>
+            </div>
+            <div>
+              <strong>{stored.profile.destiny}</strong>
+              <span>имя</span>
+            </div>
+            <div>
+              <strong>{stored.profile.month}</strong>
+              <span>месяц</span>
+            </div>
           </div>
-        ))}
-        <div className="recommended-product">
-          <span className="chip sage">Рекомендация</span>
-          <h3>{recommended?.title || "Глубокий разбор"}</h3>
-          <p>{recommended?.subtitle}</p>
-          <button className="primary-button" onClick={startCheckout}>
-            Открыть полный материал
-          </button>
+          <p className="arithmetic">{stored.profile.arithmetic}</p>
+          <p className="result-focus">
+            Ваш фокус: <b>{quiz?.focus || mini.focus}</b>
+          </p>
+          <div className="hero-actions">
+            <Link className="primary-button cta-primary" to="/numbers">
+              Полная карта чисел →
+            </Link>
+            <Link className="secondary-button" to="/today">
+              Моя тема дня
+            </Link>
+          </div>
+        </div>
+
+        {/* RIGHT: UPSELL */}
+        <div className="soft-card locked-card upsell-card">
+          <div className="upsell-header">
+            <span className="chip">Рекомендация под ваш запрос</span>
+            <h2>{recommended?.title || "Глубокий разбор"}</h2>
+            <p className="upsell-subtitle">{recommended?.subtitle}</p>
+          </div>
+
+          <div className="upsell-value">
+            <h3>Внутри ещё {miniReportSections.length} закрытых секции:</h3>
+            {miniReportSections.map((section, i) => (
+              <div key={section.title} className="upsell-section">
+                <div className="upsell-section-header">
+                  <span className="upsell-number">{i + 1}</span>
+                  <h4>{section.title}</h4>
+                  <span className="lock-icon">🔒</span>
+                </div>
+                <ul className="feature-list">
+                  {section.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="upsell-cta">
+            <div className="upsell-price">
+              <span className="price-label">Разовая покупка</span>
+              <span className="price-amount">
+                {recommended?.price ? `${recommended.price} ₽` : "от 990 ₽"}
+              </span>
+              <span className="price-note">PDF включён · навсегда в кабинете</span>
+            </div>
+            <button className="primary-button cta-primary cta-large" onClick={startCheckout}>
+              Открыть полный материал →
+            </button>
+            <p className="upsell-guarantee">
+              🛡 7 дней бесплатно в клубе · без карты · без автосписаний
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* NEXT STEPS */}
+      <div className="result-next-steps">
+        <h2>Что делать дальше</h2>
+        <div className="next-steps-grid">
+          <Link to="/journal" className="soft-card next-step-card">
+            <span className="next-icon">📝</span>
+            <h3>Запишите первую мысль</h3>
+            <p>2 минуты в дневнике — и вы уже замечаете паттерны</p>
+            <span className="step-cta">Начать запись →</span>
+          </Link>
+          <Link to="/practices" className="soft-card next-step-card">
+            <span className="next-icon">🎯</span>
+            <h3>Попробуйте практику</h3>
+            <p>Первый день бесплатно: границы, ясность или диалог</p>
+            <span className="step-cta">Выбрать практику →</span>
+          </Link>
+          <Link to="/club" className="soft-card next-step-card">
+            <span className="next-icon">✦</span>
+            <h3>7 дней всё включено</h3>
+            <p>Все материалы, практики и AI — бесплатно на неделю</p>
+            <span className="step-cta">Попробовать клуб →</span>
+          </Link>
         </div>
       </div>
     </section>

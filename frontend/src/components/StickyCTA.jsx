@@ -5,10 +5,16 @@ export default function StickyCTA({
   children = "Пройти мини-разбор",
 }) {
   return (
-    <div className="sticky-cta">
-      <Link className="primary-button" to={to}>
-        {children}
-      </Link>
+    <div className="sticky-cta-bar">
+      <div className="sticky-cta-inner">
+        <div className="sticky-cta-text">
+          <strong>Сохраните результаты</strong>
+          <span>Создайте аккаунт — бесплатно, без карты</span>
+        </div>
+        <Link className="primary-button cta-primary" to={to}>
+          {children} →
+        </Link>
+      </div>
     </div>
   );
 }
