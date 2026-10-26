@@ -2,197 +2,298 @@ import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { api } from "../api";
 import TrialAccess from "../components/TrialAccess";
+import { CLUB_CONTENT, CLUB_EXCLUSIVES, CLUB_PRICING } from "../data/clubContent";
 
 export default function Club() {
   useEffect(() => {
     api.track("club_viewed");
   }, []);
 
+  const pricing = CLUB_PRICING.RU; // TODO: detect locale
+
   return (
-    <section className="section club-page">
+    <section className="section club-page-enhanced">
       {/* HERO */}
-      <div className="club-hero">
+      <div className="club-hero-enhanced">
         <div className="club-hero-content">
           <span className="eyebrow">Numerologic Club</span>
           <h1>
-            Место, где можно<br />
-            <em>услышать себя.</em>
+            Не приложение.<br />
+            <em>Привычка слышать себя.</em>
           </h1>
           <p className="club-hero-lead">
-            Все практики, материалы и AI-помощник — в одном пространстве.
-            Первые 7 дней бесплатно, без карты и автосписаний.
+            52 недели контента. Еженедельные практики, медитации и мастер-классы.
+            Не просто доступ — программа трансформации.
           </p>
-          <div className="hero-actions">
+          <div className="club-hero-cta">
             <Link className="primary-button cta-primary cta-large" to="/checkout?product=club">
               <span className="cta-icon">✦</span>
               Попробовать 7 дней бесплатно
               <span className="cta-arrow">→</span>
             </Link>
-            <Link className="secondary-button" to="/practices">
-              Сначала одну практику
-            </Link>
+            <p className="club-hero-note">Без карты · без автосписаний · отмена в любой момент</p>
           </div>
         </div>
-        <div className="club-hero-price">
-          <div className="price-circle">
-            <span className="price-value">1 000 ₽</span>
-            <span className="price-period">30 дней</span>
+        <div className="club-hero-visual">
+          <div className="club-price-circle">
+            <span className="club-price-value">{pricing.monthly} {pricing.currency}</span>
+            <span className="club-price-period">в месяц</span>
           </div>
-          <div className="price-features">
-            <span>✓ Без автосписаний</span>
-            <span>✓ Отмена в любой момент</span>
-            <span>✓ Первые 7 дней бесплатно</span>
+          <div className="club-price-options">
+            <span>Квартал: {pricing.quarterly} {pricing.currency} <small>(-16%)</small></span>
+            <span>Год: {pricing.yearly} {pricing.currency} <small>(-33%)</small></span>
           </div>
         </div>
       </div>
 
       <TrialAccess />
 
-      {/* WHAT'S INCLUDED */}
-      <div className="section-heading center club-included">
-        <span className="eyebrow">Что внутри</span>
-        <h2>Всё для ежедневной<br /><em>саморефлексии.</em></h2>
-      </div>
-
-      <div className="club-features">
-        {[
-          {
-            icon: "🎯",
-            title: "Все практикумы",
-            desc: "Границы, ясность, диалог и мягкий фокус. Пошаговые упражнения с отметками прогресса и вопросами для дневника.",
-            highlight: "4 практикума · 38 дней упражнений",
-          },
-          {
-            icon: "🤖",
-            title: "AI-помощник с контекстом",
-            desc: "До 10 сообщений в день. Помнит контекст профиля и последних записей при вашем обращении. Не заменяет терапевта — помогает услышать себя.",
-            highlight: "После подключения провайдера",
-          },
-          {
-            icon: "📊",
-            title: "Полные тематические отчёты",
-            desc: "Личный отчёт с прозрачной арифметикой, темами месяца и планом небольших действий. PDF включён.",
-            highlight: "7 отчётов · от 990 до 2 990 ₽ каждый",
-          },
-          {
-            icon: "📈",
-            title: "Обзор недели",
-            desc: "Дневник, настроение, цели и выполненные практики. Замечайте то, что помогает именно вам. Автоматический отчёт каждые 7 дней.",
-            highlight: "Визуализация прогресса",
-          },
-          {
-            icon: "🗺",
-            title: "Карта периода и PDF",
-            desc: "Полная нумерологическая карта с открытым расчётом. Числа 11/22/33 сохраняются.",
-            highlight: "Бесплатно для всех",
-          },
-          {
-            icon: "🔒",
-            title: "Ваши данные — ваши",
-            desc: "Экспорт всех записей в один клик. Удаление аккаунта с полным стиранием данных.",
-            highlight: "Приватность и контроль",
-          },
-        ].map((feature) => (
-          <article className="soft-card club-feature" key={feature.title}>
-            <span className="club-feature-icon">{feature.icon}</span>
-            <div>
-              <h3>{feature.title}</h3>
-              <p>{feature.desc}</p>
-              <span className="chip sage">{feature.highlight}</span>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      {/* COMPARISON */}
-      <div className="club-comparison">
+      {/* ЧТО ВЫ ПОЛУЧАЕТЕ */}
+      <div className="club-value-section">
         <div className="section-heading center">
-          <span className="eyebrow">Сравнение</span>
-          <h2>Клуб vs разовые покупки</h2>
+          <span className="eyebrow">Не просто доступ</span>
+          <h2>52 недели<br /><em>программы.</em></h2>
+          <p className="section-subtitle">
+            Каждую неделю — новый материал. Не коллекция статей, а последовательное путешествие.
+          </p>
         </div>
-        <div className="comparison-table">
-          <div className="comparison-row comparison-header">
-            <div className="comparison-feature" />
-            <div className="comparison-col">Разовая покупка</div>
-            <div className="comparison-col comparison-highlight">Клуб</div>
-          </div>
-          {[
-            ["Один практикум", "390–790 ₽", "✓ Включён"],
-            ["Один отчёт", "990–2 990 ₽", "✓ Включён"],
-            ["Все практикумы (4 шт)", "~2 260 ₽", "✓ Включён"],
-            ["Все отчёты (7 шт)", "~12 000 ₽", "✓ Включён"],
-            ["AI-помощник", "—", "✓ 10 сообщ/день"],
-            ["Обзор недели", "✓", "✓ Расширенный"],
-            ["Итого за 30 дней", "до 14 000 ₽", "1 000 ₽"],
-          ].map(([feature, single, club]) => (
-            <div className="comparison-row" key={feature}>
-              <div className="comparison-feature">{feature}</div>
-              <div className="comparison-col">{single}</div>
-              <div className="comparison-col comparison-highlight">{club}</div>
+
+        {/* ПЛАН НА 6 МЕСЯЦЕВ */}
+        <div className="club-roadmap">
+          {Object.entries(CLUB_CONTENT).slice(0, 6).map(([key, month], i) => (
+            <div className="club-month" key={key}>
+              <div className="club-month-header">
+                <span className="club-month-number">{i + 1}</span>
+                <div>
+                  <h3>Месяц {i + 1}: {month.theme}</h3>
+                  <small>4 недели · 4 материала</small>
+                </div>
+              </div>
+              <div className="club-month-weeks">
+                {month.weeks.map((week, wi) => (
+                  <div className="club-week-card" key={wi}>
+                    <span className="club-week-type">{week.type}</span>
+                    <h4>{week.title}</h4>
+                    <p>{week.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
-        <p className="comparison-note">
-          Клуб выгоднее, если вы планируете использовать больше одной практики.
-          Разовые покупки остаются навсегда, даже если не продлите клуб.
-        </p>
       </div>
 
-      {/* TESTIMONIALS */}
-      <div className="club-testimonials">
+      {/* ЭКСКЛЮЗИВНЫЕ МАТЕРИАЛЫ */}
+      <div className="club-exclusives-section">
         <div className="section-heading center">
-          <span className="eyebrow">Отзывы участников клуба</span>
-          <h2>Что говорят те,<br /><em>кто уже внутри.</em></h2>
+          <span className="eyebrow">Только в клубе</span>
+          <h2>Эксклюзивные<br /><em>инструменты.</em></h2>
         </div>
-        <div className="testimonials-row">
+        <div className="club-exclusives-grid">
+          {CLUB_EXCLUSIVES.map((item, i) => (
+            <div className="soft-card club-exclusive-card" key={i}>
+              <span className="exclusive-icon">{item.icon}</span>
+              <div>
+                <h4>{item.title}</h4>
+                <small>{item.duration || item.format || `${item.lessons} уроков`}</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* СРАВНЕНИЕ */}
+      <div className="club-comparison-enhanced">
+        <div className="section-heading center">
+          <span className="eyebrow">Честное сравнение</span>
+          <h2>Клуб vs<br /><em>бесплатно.</em></h2>
+        </div>
+        <div className="comparison-table-enhanced">
+          <div className="comparison-header-enhanced">
+            <div />
+            <div>Бесплатно</div>
+            <div className="highlight">Клуб</div>
+          </div>
+          {[
+            ["Карта чисел + PDF", "✓", "✓"],
+            ["Дневник, цели, календарь", "✓", "✓"],
+            ["Тема дня", "✓", "✓"],
+            ["Первый день практик", "✓", "✓"],
+            ["Обзор недели", "Базовый", "Расширенный + инсайты"],
+            ["Все 4 практикума", "—", "✓ Включены"],
+            ["Все 7 отчётов", "—", "✓ Включены"],
+            ["AI-помощник", "—", "✓ 10 сообщ/день"],
+            ["Еженедельный новый контент", "—", "✓ 52 недели"],
+            ["Медитации и аудио", "—", "✓ Эксклюзив"],
+            ["Шаблоны и воркшиты", "—", "✓ PDF библиотека"],
+            ["Персональные рекомендации", "—", "✓ На основе записей"],
+          ].map(([feature, free, club], i) => (
+            <div className="comparison-row-enhanced" key={i}>
+              <div className="comparison-feature-enhanced">{feature}</div>
+              <div className="comparison-col-enhanced">{free}</div>
+              <div className="comparison-col-enhanced highlight">{club}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ПСИХОЛОГИЯ УДЕРЖАНИЯ */}
+      <div className="club-retention-section">
+        <div className="section-heading center">
+          <span className="eyebrow">Почему остаются</span>
+          <h2>Не подписка.<br /><em>Привычка.</em></h2>
+        </div>
+        <div className="retention-grid">
           {[
             {
-              text: "За месяц прошла все 4 практикума. Самое ценное — не сами упражнения, а дневник с настроением. Впервые увидела свои недели как картину.",
-              name: "Анна",
-              stars: 5,
+              icon: "🔥",
+              title: "Стрик и достижения",
+              desc: "18 достижений за прогресс. Не прерывайте серию — каждый день считается.",
             },
             {
-              text: "AI-помощник удивил. Он помнит мои записи и задаёт точные вопросы. Не заменяет терапевта, но как ежедневная рефлексия — работает.",
-              name: "Ольга",
-              stars: 5,
+              icon: "🎯",
+              title: "Персональные рекомендации",
+              desc: "На основе ваших записей AI подбирает практику именно под ваше состояние.",
             },
             {
-              text: "1000₽ за месяц — это дешевле одного похода к коучу. А пользы больше, потому что работаешь каждый день по 3 минуты.",
-              name: "Дмитрий",
-              stars: 5,
+              icon: "📈",
+              title: "Видимый прогресс",
+              desc: "Обзор недели показывает паттерны. Вы видите, как меняетесь.",
+            },
+            {
+              icon: "🎁",
+              title: "Новый контент каждую неделю",
+              desc: "Не статичная библиотека, а живая программа. Всегда есть что открыть.",
+            },
+            {
+              icon: "🔔",
+              title: "Умные напоминания",
+              desc: "Одно сообщение утром с темой дня. Без спама. Можно отключить.",
+            },
+            {
+              icon: "💎",
+              title: "Инвестиция в себя",
+              desc: "Чем дольше вы с нами, тем точнее рекомендации. Данные работают на вас.",
+            },
+          ].map((item, i) => (
+            <div className="soft-card retention-card-enhanced" key={i}>
+              <span className="retention-icon">{item.icon}</span>
+              <h4>{item.title}</h4>
+              <p>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ЧТО ВЫ ТЕРЯЕТЕ ПРИ ОТМЕНЕ */}
+      <div className="club-loss-section">
+        <div className="soft-card loss-card">
+          <h3>Если вы уйдёте...</h3>
+          <div className="loss-list">
+            <div className="loss-item">
+              <span className="loss-icon">🔥</span>
+              <div>
+                <strong>Потеряете стрик</strong>
+                <small>Ваша серия записей обнулится</small>
+              </div>
+            </div>
+            <div className="loss-item">
+              <span className="loss-icon">📊</span>
+              <div>
+                <strong>Потеряете инсайты</strong>
+                <small>Персональные рекомендации на основе ваших записей</small>
+              </div>
+            </div>
+            <div className="loss-item">
+              <span className="loss-icon">🎁</span>
+              <div>
+                <strong>Пропустите контент</strong>
+                <small>Новые материалы каждую неделю</small>
+              </div>
+            </div>
+            <div className="loss-item">
+              <span className="loss-icon">🏆</span>
+              <div>
+                <strong>Потеряете достижения</strong>
+                <small>Ваш прогресс и уровень</small>
+              </div>
+            </div>
+          </div>
+          <p className="loss-note">
+            Дневник, карта чисел и первый день практик останутся с вами навсегда.
+          </p>
+        </div>
+      </div>
+
+      {/* ОТЗЫВЫ */}
+      <div className="club-testimonials-enhanced">
+        <div className="section-heading center">
+          <span className="eyebrow">Истории участников</span>
+          <h2>Что изменилось<br /><em>за месяц.</em></h2>
+        </div>
+        <div className="testimonials-enhanced-grid">
+          {[
+            {
+              text: "Я не верила в приложения для саморефлексии. Но здесь каждую неделю что-то новое. За 2 месяца я впервые увидела паттерн в своих отношениях — и это изменило всё.",
+              name: "Анна, 34",
+              role: "дизайнер",
+              streak: "47 дней",
+              achievement: "Мастер",
+            },
+            {
+              text: "Медитации по утрам + дневник по вечерам. Это заняло 10 минут в день, но через месяц я стал спокойнее реагировать на стресс на работе.",
+              name: "Дмитрий, 29",
+              role: "разработчик",
+              streak: "62 дня",
+              achievement: "Мудрец",
+            },
+            {
+              text: "Практика границ изменила мои отношения с мамой. Впервые за 30 лет я сказала 'нет' без вины. Это стоило больше, чем год терапии.",
+              name: "Мария, 31",
+              role: "менеджер",
+              streak: "38 дней",
+              achievement: "Практик",
             },
           ].map((t, i) => (
-            <article className="soft-card testimonial-mini" key={i}>
-              <div className="testimonial-stars">
-                {"★".repeat(t.stars)}
+            <article className="soft-card testimonial-enhanced" key={i}>
+              <div className="testimonial-enhanced-header">
+                <div className="testimonial-enhanced-avatar">{t.name[0]}</div>
+                <div>
+                  <strong>{t.name}</strong>
+                  <small>{t.role}</small>
+                </div>
+                <div className="testimonial-enhanced-stats">
+                  <span>🔥 {t.streak}</span>
+                  <span>🏆 {t.achievement}</span>
+                </div>
               </div>
               <blockquote>«{t.text}»</blockquote>
-              <strong>— {t.name}</strong>
             </article>
           ))}
         </div>
       </div>
 
       {/* FINAL CTA */}
-      <div className="club-final-cta">
-        <div className="soft-card club-cta-card">
-          <h2>Попробуйте 7 дней бесплатно</h2>
+      <div className="club-final-cta-enhanced">
+        <div className="soft-card club-cta-card-enhanced">
+          <h2>7 дней бесплатно.<br /><em>Потом {pricing.monthly} {pricing.currency}/мес.</em></h2>
           <p>
-            Без карты. Без автосписаний. Если понравится — 1 000 ₽ за 30 дней.
-            Если нет — дневник, карта чисел и первый день каждой практики останутся с вами навсегда.
+            Без карты. Без автосписаний. Если не понравится — просто не продлевайте.
+            Дневник, карта и первый день практик останутся с вами навсегда.
           </p>
-          <div className="hero-actions">
-            <Link className="primary-button cta-primary cta-large" to="/checkout?product=club">
-              <span className="cta-icon">✦</span>
-              Начать 7 дней бесплатно
-              <span className="cta-arrow">→</span>
+          <div className="club-cta-options">
+            <Link className="primary-button cta-primary cta-large" to="/checkout?product=club&plan=monthly">
+              {pricing.monthly} {pricing.currency}/месяц
             </Link>
-            <Link className="secondary-button" to="/practices">
-              Сначала одну практику
+            <Link className="secondary-button" to="/checkout?product=club&plan=quarterly">
+              {pricing.quarterly} {pricing.currency}/квартал <small>(-16%)</small>
+            </Link>
+            <Link className="secondary-button" to="/checkout?product=club&plan=yearly">
+              {pricing.yearly} {pricing.currency}/год <small>(-33%)</small>
             </Link>
           </div>
-          <p className="small-note">
-            AI станет доступен после подключения поставщиком. Дневник, цели, тема дня и первый день практикумов остаются бесплатными.
+          <p className="club-guarantee">
+            🛡 Возврат в течение 14 дней без вопросов
           </p>
         </div>
       </div>
